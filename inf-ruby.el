@@ -312,13 +312,19 @@ Then switch to the process buffer."
                                               file-name
                                               "\"\)\n")))
 
+(defun ruby-escape-single-quoted (str)
+  (replace-regexp-in-string "'" "\\\\'"
+    (replace-regexp-in-string "\n" "\\\\n" 
+      (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
+
 (defun inf-ruby-completions (seed)
   "Return a list of completions for the line of ruby code starting with SEED."
   (let* ((proc (get-buffer-process inf-ruby-buffer))
 	 (comint-filt (process-filter proc))
 	 (kept "") completions)
     (set-process-filter proc (lambda (proc string) (setf kept (concat kept string))))
-    (process-send-string proc (format "puts IRB::InputCompletor::CompletionProc.call('%s').compact\n" seed))
+    (process-send-string proc (format "puts IRB::InputCompletor::CompletionProc.call('%s').compact\n"
+                                      (ruby-escape-single-quoted seed)))
     (while (not (string-match inf-ruby-prompt-pattern kept)) (accept-process-output proc))
     (if (string-match "^[[:alpha:]]+?Error: " kept) (error kept))
     (setf completions (butlast (split-string kept "[\r\n]") 2))
