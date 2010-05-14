@@ -219,6 +219,8 @@ of `ruby-program-name').  Runs the hooks `inferior-ruby-mode-hook'
   "Template for irb here document terminator.
 Must not contain ruby meta characters.")
 
+(defconst inf-ruby-eval-binding "IRB.conf[:MAIN_CONTEXT].workspace.binding")
+
 (defconst ruby-eval-separator "")
 
 (defun ruby-send-region (start end)
@@ -241,7 +243,9 @@ Must not contain ruby meta characters.")
         (goto-char m)
         (insert ruby-eval-separator "\n")
         (set-marker m (point))))
-    (comint-send-string (inf-ruby-proc) (format "eval <<'%s', nil, %S, %d\n" term file line))
+    (comint-send-string (inf-ruby-proc) (format "eval <<'%s', %s, %S, %d\n"
+                                                term inf-ruby-eval-binding
+                                                file line))
     (comint-send-region (inf-ruby-proc) start end)
     (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))))
 
