@@ -329,7 +329,8 @@ Then switch to the process buffer."
     (set-process-filter proc (lambda (proc string) (setf kept (concat kept string))))
     (process-send-string proc (format "puts IRB::InputCompletor::CompletionProc.call('%s').compact\n"
                                       (ruby-escape-single-quoted seed)))
-    (while (not (string-match inf-ruby-prompt-pattern kept)) (accept-process-output proc))
+    (while (and (not (string-match inf-ruby-prompt-pattern kept))
+                (accept-process-output proc 2)))
     (if (string-match "^[[:alpha:]]+?Error: " kept) (error kept))
     (setf completions (cdr (butlast (split-string kept "[\r\n]") 2)))
     (set-process-filter proc comint-filt)
