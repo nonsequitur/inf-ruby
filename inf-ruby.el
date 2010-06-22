@@ -50,7 +50,7 @@
   (let ((map (copy-keymap comint-mode-map)))
     (define-key map (kbd "C-c C-l") 'inf-ruby-load-file)
     (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
-    (define-key map (kbd "TAB") 'inf-ruby-complete-or-tab)
+    (define-key map (kbd "TAB") 'inf-ruby-complete)
     map)
   "*Mode map for inf-ruby-mode")
 
@@ -344,26 +344,34 @@ Then switch to the process buffer."
     (set-process-filter proc comint-filt)
     completions))
 
+(defun inf-ruby-completion-at-point ()
+  (if inf-ruby-at-top-level-prompt-p
+      (let* ((curr (thing-at-point 'line))
+             (completions (inf-ruby-completions curr)))
+        (case (length completions)
+          (0 nil)
+          (1 (car completions))
+          (t (completing-read "possible completions: "
+                              completions nil t curr))))
+    (message "Completion aborted: Not at a top-level prompt")
+    nil))
+
+(defun inf-ruby-complete (command)
+  "Complete the ruby code at point. Relies on the irb/completion
+Module used by readline when running irb through a terminal"
+  (interactive (list (inf-ruby-completion-at-point)))
+  (when command
+   (move-beginning-of-line 1)
+   (kill-line 1)
+   (insert command)))
+
 (defun inf-ruby-complete-or-tab (&optional command)
   "Either complete the ruby code at point or call
-`indent-for-tab-command' if no completion is available.  Relies
-on the irb/completion Module used by readline when running irb
-through a terminal."
-  (interactive (list (if inf-ruby-at-top-level-prompt-p
-                         (let* ((curr (thing-at-point 'line))
-                                (completions (inf-ruby-completions curr)))
-                           (case (length completions)
-                             (0 nil)
-                             (1 (car completions))
-                             (t (completing-read "possible completions: "
-                                                 completions nil t curr))))
-                       (message "Completion aborted: Not at a top-level prompt")
-                       nil)))
+`indent-for-tab-command' if no completion is available."
+  (interactive (list (inf-ruby-completion-at-point)))
   (if (not command)
       (call-interactively 'indent-for-tab-command)
-    (move-beginning-of-line 1)
-    (kill-line 1)
-    (insert command)))
+    (inf-ruby-complete command)))
 
 ;;;###autoload
 (eval-after-load 'ruby-mode
