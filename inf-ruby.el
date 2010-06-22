@@ -74,6 +74,8 @@ Caches the last pair used in the last ruby-load-file command.
 Used for determining the default in the
 next one.")
 
+(defvar inf-ruby-at-top-level-prompt-p t)
+
 (defconst inf-ruby-error-regexp-alist
   '(("SyntaxError: compile error\n^\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
     ("^\tfrom \\([^\(].*\\):\\([1-9][0-9]*\\)\\(:in `.*'\\)?$" 1 2)))
@@ -136,6 +138,7 @@ to continue it."
   (setq mode-line-process '(":%s"))
   (use-local-map inf-ruby-mode-map)
   (setq comint-input-filter (function inf-ruby-input-filter))
+  (add-to-list 'comint-output-filter-functions 'inf-ruby-output-filter)
   (setq comint-get-old-input (function inf-ruby-get-old-input))
   (make-local-variable 'compilation-error-regexp-alist)
   (setq compilation-error-regexp-alist inf-ruby-error-regexp-alist)
@@ -149,6 +152,12 @@ Defaults to a regexp ignoring all inputs of 0, 1, or 2 letters.")
 (defun inf-ruby-input-filter (str)
   "Don't save anything matching inf-ruby-filter-regexp"
   (not (string-match inf-ruby-filter-regexp str)))
+
+(defun inf-ruby-output-filter (output)
+  "Check if the current prompt is a top-level prompt"
+  (setq inf-ruby-at-top-level-prompt-p
+        (string-match inf-ruby-prompt-pattern
+                      (car (last (split-string output "\n"))))))
 
 ;; adapted from replace-in-string in XEmacs (subr.el)
 (defun inf-ruby-remove-in-string (str regexp)
@@ -340,12 +349,16 @@ Then switch to the process buffer."
 `indent-for-tab-command' if no completion is available.  Relies
 on the irb/completion Module used by readline when running irb
 through a terminal."
-  (interactive (list (let* ((curr (thing-at-point 'line))
-			    (completions (inf-ruby-completions curr)))
-		       (case (length completions)
-			 (0 nil)
-			 (1 (car completions))
-			 (t (completing-read "possible completions: " completions nil 'confirm-only curr))))))
+  (interactive (list (if inf-ruby-at-top-level-prompt-p
+                         (let* ((curr (thing-at-point 'line))
+                                (completions (inf-ruby-completions curr)))
+                           (case (length completions)
+                             (0 nil)
+                             (1 (car completions))
+                             (t (completing-read "possible completions: "
+                                                 completions nil t curr))))
+                       (message "Completion aborted: Not at a top-level prompt")
+                       nil)))
   (if (not command)
       (call-interactively 'indent-for-tab-command)
     (move-beginning-of-line 1)
