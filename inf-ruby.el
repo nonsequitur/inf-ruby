@@ -346,7 +346,7 @@ Then switch to the process buffer."
 
 (defun inf-ruby-completion-at-point ()
   (if inf-ruby-at-top-level-prompt-p
-      (let* ((curr (thing-at-point 'line))
+      (let* ((curr (replace-regexp-in-string "\n$" "" (thing-at-point 'line)))
              (completions (inf-ruby-completions curr)))
         (case (length completions)
           (0 nil)
@@ -361,8 +361,7 @@ Then switch to the process buffer."
 Module used by readline when running irb through a terminal"
   (interactive (list (inf-ruby-completion-at-point)))
   (when command
-   (move-beginning-of-line 1)
-   (kill-line 1)
+   (kill-whole-line 0)
    (insert command)))
 
 (defun inf-ruby-complete-or-tab (&optional command)
