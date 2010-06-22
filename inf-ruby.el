@@ -331,7 +331,6 @@ Then switch to the process buffer."
                                       (ruby-escape-single-quoted seed)))
     (while (and (not (string-match inf-ruby-prompt-pattern kept))
                 (accept-process-output proc 2)))
-    (if (string-match "^[[:alpha:]]+?Error: " kept) (error kept))
     (setf completions (cdr (butlast (split-string kept "[\r\n]") 2)))
     (set-process-filter proc comint-filt)
     completions))
