@@ -224,7 +224,7 @@ Must not contain ruby meta characters.")
 (defun ruby-send-region (start end)
   "Send the current region to the inferior Ruby process."
   (interactive "r")
-  (let (term (file (buffer-file-name)) line)
+  (let (term (file (or buffer-file-name (buffer-name))) line)
     (save-excursion
       (save-restriction
         (widen)
