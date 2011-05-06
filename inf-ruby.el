@@ -2,11 +2,11 @@
 
 ;; Copyright (C) 1999-2008 Yukihiro Matsumoto, Nobuyoshi Nakada
 
-;; Authors: Yukihiro Matsumoto, Nobuyoshi Nakada
-;; URL: http://www.emacswiki.org/cgi-bin/wiki/RubyMode
+;; Author: Yukihiro Matsumoto, Nobuyoshi Nakada
+;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.2
+;; Version: 2.2.1
 ;; Package-Requires: ((ruby-mode "1.1"))
 
 ;;; Commentary:
