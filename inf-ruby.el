@@ -347,11 +347,11 @@ Then switch to the process buffer."
   (if inf-ruby-at-top-level-prompt-p
       (let* ((curr (replace-regexp-in-string "\n$" "" (thing-at-point 'line)))
              (completions (inf-ruby-completions curr)))
-        (case (length completions)
-          (0 nil)
-          (1 (car completions))
-          (t (completing-read "possible completions: "
-                              completions nil t curr))))
+        (if completions
+            (if (= (length completions) 1)
+                (car completions)
+              (completing-read "possible completions: "
+                               completions nil t curr))))
     (message "Completion aborted: Not at a top-level prompt")
     nil))
 
