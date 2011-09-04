@@ -33,6 +33,9 @@
 (require 'compile)
 (require 'ruby-mode)
 
+(eval-when-compile
+  (require 'cl))
+
 (defvar inf-ruby-default-implementation "ruby"
   "Which ruby implementation to use if none is specified.")
 
