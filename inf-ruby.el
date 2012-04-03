@@ -373,7 +373,7 @@ Module used by readline when running irb through a terminal"
 
 ;;;###autoload
 (eval-after-load 'ruby-mode
-  '(add-hook 'ruby-mode-hook 'inf-ruby-keys))
+  '(inf-ruby-keys))
 
 (provide 'inf-ruby)
 ;;; inf-ruby.el ends here
