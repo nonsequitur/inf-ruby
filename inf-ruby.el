@@ -80,7 +80,7 @@ next one.")
     ("^\tfrom \\([^\(].*\\):\\([1-9][0-9]*\\)\\(:in `.*'\\)?$" 1 2)))
 
 ;;;###autoload
-(defun inf-ruby-keys ()
+(defun inf-ruby-setup-keybindings ()
   "Set local key defs to invoke inf-ruby from ruby-mode."
   (define-key ruby-mode-map "\M-\C-x" 'ruby-send-definition)
   (define-key ruby-mode-map "\C-x\C-e" 'ruby-send-last-sexp)
@@ -373,7 +373,7 @@ Module used by readline when running irb through a terminal"
 
 ;;;###autoload
 (eval-after-load 'ruby-mode
-  '(inf-ruby-keys))
+  '(inf-ruby-setup-keybindings))
 
 (provide 'inf-ruby)
 ;;; inf-ruby.el ends here
