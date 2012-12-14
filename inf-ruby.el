@@ -25,9 +25,6 @@
 ;; inferior-ruby-error-regexp-alist doesn't match this example
 ;;   SyntaxError: /home/eschulte/united/org/work/arf/arf/lib/cluster.rb:35: syntax error, unexpected '~', expecting kEND
 ;;               similarity = comparison_cache[m][n] ||= clusters[m] ~ clusters[n]
-;;
-;; M-p skips the first entry in the input ring.
-;;
 
 (require 'comint)
 (require 'compile)
