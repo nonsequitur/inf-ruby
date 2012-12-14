@@ -136,7 +136,6 @@ to continue it."
   (setq mode-name "Inf-Ruby")
   (setq mode-line-process '(":%s"))
   (use-local-map inf-ruby-mode-map)
-  (setq comint-input-filter comint-input-filter)
   (add-to-list 'comint-output-filter-functions 'inf-ruby-output-filter)
   (setq comint-get-old-input (function inf-ruby-get-old-input))
   (make-local-variable 'compilation-error-regexp-alist)
