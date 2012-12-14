@@ -329,7 +329,7 @@ Then switch to the process buffer."
     (replace-regexp-in-string "\n" "\\\\n"
       (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
 
-(defun inf-ruby-fix-completions-on-windows ()
+(defsubst inf-ruby-fix-completions-on-windows ()
   "On Windows, the string received by `accept-process-output'
 starts with the last line that was sent to the Ruby process.
 The reason for this is unknown. Remove this line from `completions'."
