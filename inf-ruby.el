@@ -269,7 +269,7 @@ Must not contain ruby meta characters.")
 (defun ruby-send-last-sexp ()
   "Send the previous sexp to the inferior Ruby process."
   (interactive)
-  (ruby-send-region (save-excursion (backward-sexp) (point)) (point)))
+  (ruby-send-region (save-excursion (ruby-backward-sexp) (point)) (point)))
 
 (defun ruby-send-block ()
   "Send the current block to the inferior Ruby process."
