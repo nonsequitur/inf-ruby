@@ -136,21 +136,13 @@ to continue it."
   (setq mode-name "Inf-Ruby")
   (setq mode-line-process '(":%s"))
   (use-local-map inf-ruby-mode-map)
-  (setq comint-input-filter (function inf-ruby-input-filter))
+  (setq comint-input-filter comint-input-filter)
   (add-to-list 'comint-output-filter-functions 'inf-ruby-output-filter)
   (setq comint-get-old-input (function inf-ruby-get-old-input))
   (make-local-variable 'compilation-error-regexp-alist)
   (setq compilation-error-regexp-alist inf-ruby-error-regexp-alist)
   (compilation-shell-minor-mode t)
   (run-hooks 'inf-ruby-mode-hook))
-
-(defvar inf-ruby-filter-regexp "\\`\\s *\\S ?\\S ?\\s *\\'"
-  "*Input matching this regexp are not saved on the history list.
-Defaults to a regexp ignoring all inputs of 0, 1, or 2 letters.")
-
-(defun inf-ruby-input-filter (str)
-  "Don't save anything matching inf-ruby-filter-regexp"
-  (not (string-match inf-ruby-filter-regexp str)))
 
 (defun inf-ruby-output-filter (output)
   "Check if the current prompt is a top-level prompt"
