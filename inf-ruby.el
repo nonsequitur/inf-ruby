@@ -54,6 +54,7 @@
   '(("ruby"     . "irb --inf-ruby-mode -r irb/completion")
     ("jruby"    . "jruby -S irb -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
+    ("rails"    . "rails c")
     ("yarv"     . "irb1.9 --inf-ruby-mode -r irb/completion")) ;; TODO: ironruby?
   "An alist of ruby implementations to irb executable names.")
 
