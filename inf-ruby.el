@@ -55,6 +55,10 @@
     ("jruby"    . "jruby -S irb -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("rails"    . "rails c")
+    ;; This will be optionally invoked by the user 
+    ;; and it will be the user's responsibility to ensure that
+    ;; emacs' current directory is a rails app root, else
+    ;; the user will get a message about rails usage.
     ("yarv"     . "irb1.9 --inf-ruby-mode -r irb/completion")) ;; TODO: ironruby?
   "An alist of ruby implementations to irb executable names.")
 
