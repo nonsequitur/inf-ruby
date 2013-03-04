@@ -36,6 +36,9 @@
 (defvar inf-ruby-first-prompt-pattern "^irb(.*)[0-9:]+0> *"
   "First prompt regex pattern of ruby interpreter.")
 
+(defvar inf-ruby-rbx-first-prompt-pattern "^rbx\.\*[0-9:]+ > *"
+  "First prompt regex pattern of Rubinius interpreter.")
+
 (defvar inf-ruby-prompt-pattern "^\\(irb(.*)[0-9:]+[>*\"'] *\\)+"
   "Prompt regex pattern of ruby interpreter.")
 
@@ -177,6 +180,9 @@ run)."
                                           (mapc #'car inf-ruby-implementations))
                        inf-ruby-default-implementation)))
   (setq impl (or impl "ruby"))
+
+  (when (equalp impl "rubinius")
+    (setq inf-ruby-first-prompt-pattern 'inf-ruby-rbx-first-prompt-pattern))
 
   (let ((command (cdr (assoc impl inf-ruby-implementations))))
     (run-ruby command impl)))
