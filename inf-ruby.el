@@ -76,6 +76,9 @@ next one.")
   '(("SyntaxError: compile error\n^\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
     ("^\tfrom \\([^\(].*\\):\\([1-9][0-9]*\\)\\(:in `.*'\\)?$" 1 2)))
 
+(defconst comint-max-input-size 4096
+  "Maximum size of string that can be sent to comint buffer before it is cut off")
+
 ;;;###autoload
 (defun inf-ruby-setup-keybindings ()
   "Set local key defs to invoke inf-ruby from ruby-mode."
@@ -242,7 +245,12 @@ Must not contain ruby meta characters.")
     (comint-send-string (inf-ruby-proc) (format "eval <<'%s', %s, %S, %d\n"
                                                 term inf-ruby-eval-binding
                                                 file line))
-    (comint-send-region (inf-ruby-proc) start end)
+    (let ((pages (1+ (/ (- end start) comint-max-input-size))))
+      (dotimes (page pages)
+        (let* ((page-start (+ (* page comint-max-input-size) start))
+               (page-end (min end (1- (+ page-start comint-max-input-size)))))
+          (comint-send-region (inf-ruby-proc) page-start page-end)
+          (comint-send-string (inf-ruby-proc) "\n"))))
     (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))))
 
 (defun ruby-send-definition ()
