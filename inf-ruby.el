@@ -51,10 +51,10 @@
   "*Mode map for inf-ruby-mode")
 
 (defvar inf-ruby-implementations
-  '(("ruby"     . "irb --inf-ruby-mode -r irb/completion")
+  '(("ruby"     . "irb -r irb/completion")
     ("jruby"    . "jruby -S irb -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
-    ("yarv"     . "irb1.9 --inf-ruby-mode -r irb/completion")) ;; TODO: ironruby?
+    ("yarv"     . "irb1.9 -r irb/completion")) ;; TODO: ironruby?
   "An alist of ruby implementations to irb executable names.")
 
 ;; TODO: do we need these two defvars?
@@ -143,7 +143,7 @@ to continue it."
 (defun inf-ruby-output-filter (output)
   "Check if the current prompt is a top-level prompt"
   (setq inf-ruby-at-top-level-prompt-p
-        (string-match inf-ruby-prompt-pattern
+        (string-match inf-ruby-first-prompt-pattern
                       (car (last (split-string output "\n"))))))
 
 ;; adapted from replace-in-string in XEmacs (subr.el)
