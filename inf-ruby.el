@@ -54,7 +54,7 @@
   '(("ruby"     . "irb --inf-ruby-mode -r irb/completion")
     ("jruby"    . "jruby -S irb -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
-    ("yarv"     . "irb1.9 --inf-ruby-mode -r irb/completion")) ;; TODO: ironruby?
+    ("yarv"     . "irb1.9 --inf-ruby-mode -r irb/completion"))
   "An alist of ruby implementations to irb executable names.")
 
 ;; TODO: do we need these two defvars?
