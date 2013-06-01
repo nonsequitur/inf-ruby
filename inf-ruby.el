@@ -58,8 +58,7 @@
     ("macruby"  . "macirb -r irb/completion"))
   "An alist of ruby implementations to irb executable names.")
 
-;; TODO: do we need these two defvars?
-(defvar ruby-source-modes '(ruby-mode)
+(defvar ruby-source-modes '(ruby-mode enh-ruby-mode)
   "*Used to determine if a buffer contains Ruby source code.
 If it's loaded into a buffer that is in one of these major modes, it's
 considered a ruby source file by ruby-load-file.
@@ -79,18 +78,28 @@ next one.")
 
 ;;;###autoload
 (defun inf-ruby-setup-keybindings ()
-  "Set local key defs to invoke inf-ruby from ruby-mode."
-  (define-key ruby-mode-map (kbd "C-M-x") 'ruby-send-definition)
-  (define-key ruby-mode-map (kbd "C-x C-e") 'ruby-send-last-sexp)
-  (define-key ruby-mode-map (kbd "C-c C-b") 'ruby-send-block)
-  (define-key ruby-mode-map (kbd "C-c M-b") 'ruby-send-block-and-go)
-  (define-key ruby-mode-map (kbd "C-c C-x") 'ruby-send-definition)
-  (define-key ruby-mode-map (kbd "C-c M-x") 'ruby-send-definition-and-go)
-  (define-key ruby-mode-map (kbd "C-c C-r") 'ruby-send-region)
-  (define-key ruby-mode-map (kbd "C-c M-r") 'ruby-send-region-and-go)
-  (define-key ruby-mode-map (kbd "C-c C-z") 'ruby-switch-to-inf)
-  (define-key ruby-mode-map (kbd "C-c C-l") 'ruby-load-file)
-  (define-key ruby-mode-map (kbd "C-c C-s") 'inf-ruby))
+  "Hook up `inf-ruby-minor-mode' to each of `ruby-source-modes'."
+  (dolist (mode ruby-source-modes)
+    (add-hook (intern (format "%s-hook" mode)) 'inf-ruby-minor-mode)))
+
+(defvar inf-ruby-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-M-x") 'ruby-send-definition)
+    (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
+    (define-key map (kbd "C-c C-b") 'ruby-send-block)
+    (define-key map (kbd "C-c M-b") 'ruby-send-block-and-go)
+    (define-key map (kbd "C-c C-x") 'ruby-send-definition)
+    (define-key map (kbd "C-c M-x") 'ruby-send-definition-and-go)
+    (define-key map (kbd "C-c C-r") 'ruby-send-region)
+    (define-key map (kbd "C-c M-r") 'ruby-send-region-and-go)
+    (define-key map (kbd "C-c C-z") 'ruby-switch-to-inf)
+    (define-key map (kbd "C-c C-l") 'ruby-load-file)
+    (define-key map (kbd "C-c C-s") 'inf-ruby)))
+
+;;;###autoload
+(define-minor-mode inf-ruby-minor-mode
+  "Minor mode for interacting with the inferior process buffer."
+  :lighter "" :keymap inf-ruby-minor-mode-map)
 
 (defvar inf-ruby-buffer nil "Current irb process buffer.")
 
@@ -368,9 +377,7 @@ Module used by readline when running irb through a terminal"
       (call-interactively 'indent-for-tab-command)
     (inf-ruby-complete command)))
 
-;;;###autoload
-(eval-after-load 'ruby-mode
-  '(inf-ruby-setup-keybindings))
+;;;###autoload (inf-ruby-setup-keybindings)
 
 (provide 'inf-ruby)
 ;;; inf-ruby.el ends here
