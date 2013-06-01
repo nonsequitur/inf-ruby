@@ -107,11 +107,11 @@ inf-ruby-mode-hook (in that order).
 
 You can send text to the inferior ruby process from other buffers containing
 Ruby source.
-    ruby-switch-to-inf switches the current buffer to the ruby process buffer.
-    ruby-send-definition sends the current definition to the ruby process.
-    ruby-send-region sends the current region to the ruby process.
 
-    ruby-send-definition-and-go, ruby-send-region-and-go,
+    `ruby-switch-to-inf' switches the current buffer to the ruby process buffer.
+    `ruby-send-definition' sends the current definition to the ruby process.
+    `ruby-send-region' sends the current region to the ruby process.
+    `ruby-send-definition-and-go', `ruby-send-region-and-go'
         switch to the ruby process buffer after sending their text.
 
 Commands:
@@ -120,7 +120,7 @@ Return after the end of the process' output sends the text from the
 Return before the end of the process' output copies the sexp ending at point
     to the end of the process' output, and sends it.
 Delete converts tabs to spaces as it moves back.
-Tab indents for ruby; with arugment, shifts rest
+Tab indents for ruby; with argument, shifts rest
     of expression rigidly with the current line.
 C-M-q does Tab on each line starting within following expression.
 Paragraphs are separated only by blank lines.  # start comments.
