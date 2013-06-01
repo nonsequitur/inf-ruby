@@ -94,7 +94,8 @@ next one.")
     (define-key map (kbd "C-c M-r") 'ruby-send-region-and-go)
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-inf)
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
-    (define-key map (kbd "C-c C-s") 'inf-ruby)))
+    (define-key map (kbd "C-c C-s") 'inf-ruby)
+    map))
 
 ;;;###autoload
 (define-minor-mode inf-ruby-minor-mode
