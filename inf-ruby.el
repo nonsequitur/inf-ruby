@@ -51,8 +51,8 @@
   "*Mode map for inf-ruby-mode")
 
 (defvar inf-ruby-implementations
-  '(("ruby"     . "irb -r irb/completion")
-    ("jruby"    . "jruby -S irb -r irb/completion")
+  '(("ruby"     . "irb --prompt default -r irb/completion")
+    ("jruby"    . "jruby -S irb --prompt default -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("yarv"     . "irb1.9 -r irb/completion")
     ("macruby"  . "macirb -r irb/completion"))
