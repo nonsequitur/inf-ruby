@@ -148,6 +148,8 @@ to continue it."
   (setq comint-get-old-input (function inf-ruby-get-old-input))
   (make-local-variable 'compilation-error-regexp-alist)
   (setq compilation-error-regexp-alist inf-ruby-error-regexp-alist)
+  (when (eq system-type 'windows-nt)
+    (setq comint-process-echoes t))
   (compilation-shell-minor-mode t)
   (run-hooks 'inf-ruby-mode-hook))
 
