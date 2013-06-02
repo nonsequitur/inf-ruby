@@ -27,10 +27,24 @@
 (defvar inf-ruby-default-implementation "ruby"
   "Which Ruby implementation to use if none is specified.")
 
-(defvar inf-ruby-first-prompt-pattern "^irb(.*)[0-9:]+0> *"
+(defconst inf-ruby-prompt-format
+  (mapconcat
+   #'identity
+   '("\\(^%s> .*\\)"                     ; Simple
+     "\\(^\\(irb([^)]+)"                 ; IRB default
+     "\\(\[[0-9]+\] \\)?[Pp]ry ?([^)]+)" ; Pry
+     "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
+     ;; Statement and nesting counters, common to the last three.
+     "\\) ?[0-9:]* ?%s *\\)")
+   "\\|")
+  "Format string for the prompt regexp pattern.
+Two placeholders: first char in the Simple prompt, and the last
+graphical char in all other prompts.")
+
+(defvar inf-ruby-first-prompt-pattern (format inf-ruby-prompt-format ">" ">")
   "First prompt regex pattern of Ruby interpreter.")
 
-(defvar inf-ruby-prompt-pattern "^\\(irb(.*)[0-9:]+[>*\"'] *\\)+"
+(defvar inf-ruby-prompt-pattern (format inf-ruby-prompt-format "[?>]" "[\]>*\"'/`]")
   "Prompt regex pattern of Ruby interpreter.")
 
 (defvar inf-ruby-mode-hook nil
