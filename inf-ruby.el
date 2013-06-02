@@ -25,16 +25,16 @@
 (require 'ruby-mode)
 
 (defvar inf-ruby-default-implementation "ruby"
-  "Which ruby implementation to use if none is specified.")
+  "Which Ruby implementation to use if none is specified.")
 
 (defvar inf-ruby-first-prompt-pattern "^irb(.*)[0-9:]+0> *"
-  "First prompt regex pattern of ruby interpreter.")
+  "First prompt regex pattern of Ruby interpreter.")
 
 (defvar inf-ruby-prompt-pattern "^\\(irb(.*)[0-9:]+[>*\"'] *\\)+"
-  "Prompt regex pattern of ruby interpreter.")
+  "Prompt regex pattern of Ruby interpreter.")
 
 (defvar inf-ruby-mode-hook nil
-  "*Hook for customising inf-ruby mode.")
+  "Hook for customizing inf-ruby mode.")
 
 (defvar inf-ruby-mode-map
   (let ((map (copy-keymap comint-mode-map)))
@@ -42,7 +42,7 @@
     (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
     (define-key map (kbd "TAB") 'inf-ruby-complete)
     map)
-  "*Mode map for inf-ruby-mode")
+  "Mode map for inf-ruby-mode")
 
 (defvar inf-ruby-implementations
   '(("ruby"     . "irb --prompt default -r irb/completion")
@@ -53,9 +53,9 @@
   "An alist of ruby implementations to irb executable names.")
 
 (defvar ruby-source-modes '(ruby-mode enh-ruby-mode)
-  "*Used to determine if a buffer contains Ruby source code.
+  "Used to determine if a buffer contains Ruby source code.
 If it's loaded into a buffer that is in one of these major modes, it's
-considered a ruby source file by ruby-load-file.
+considered a ruby source file by `ruby-load-file'.
 Used by these commands to determine defaults.")
 
 (defvar ruby-prev-l/c-dir/file nil
@@ -99,15 +99,15 @@ next one.")
 (defvar inf-ruby-buffer nil "Current irb process buffer.")
 
 (defun inf-ruby-mode ()
-  "Major mode for interacting with an inferior ruby (irb) process.
+  "Major mode for interacting with an inferior Ruby (irb) process.
 
 The following commands are available:
 \\{inf-ruby-mode-map}
 
-A ruby process can be fired up with M-x inf-ruby.
+A Ruby process can be fired up with M-x inf-ruby.
 
-Customisation: Entry to this mode runs the hooks on comint-mode-hook and
-inf-ruby-mode-hook (in that order).
+Customization: When entered, this mode runs `comint-mode-hook' and
+`inf-ruby-mode-hook' (in that order).
 
 You can send text to the inferior ruby process from other buffers containing
 Ruby source.
@@ -115,7 +115,7 @@ Ruby source.
     `ruby-switch-to-inf' switches the current buffer to the ruby process buffer.
     `ruby-send-definition' sends the current definition to the ruby process.
     `ruby-send-region' sends the current region to the ruby process.
-    `ruby-send-definition-and-go', `ruby-send-region-and-go'
+    `ruby-send-definition-and-go' and `ruby-send-region-and-go'
         switch to the ruby process buffer after sending their text.
 
 Commands:
