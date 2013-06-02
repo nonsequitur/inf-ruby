@@ -20,12 +20,6 @@
 ;;    (eval-after-load 'ruby-mode
 ;;      '(add-hook 'ruby-mode-hook 'inf-ruby-setup-keybindings))
 
-;;; TODO:
-;;
-;; inferior-ruby-error-regexp-alist doesn't match this example
-;;   SyntaxError: /home/eschulte/united/org/work/arf/arf/lib/cluster.rb:35: syntax error, unexpected '~', expecting kEND
-;;               similarity = comparison_cache[m][n] ||= clusters[m] ~ clusters[n]
-
 (require 'comint)
 (require 'compile)
 (require 'ruby-mode)
@@ -73,7 +67,7 @@ next one.")
 (defvar inf-ruby-at-top-level-prompt-p t)
 
 (defconst inf-ruby-error-regexp-alist
-  '(("SyntaxError: compile error\n^\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
+  '(("SyntaxError: \\(?:compile error\n\\)?\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
     ("^\tfrom \\([^\(].*\\):\\([1-9][0-9]*\\)\\(:in `.*'\\)?$" 1 2)))
 
 ;;;###autoload
