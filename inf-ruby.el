@@ -144,7 +144,7 @@ to continue it."
   (setq mode-name "Inf-Ruby")
   (setq mode-line-process '(":%s"))
   (use-local-map inf-ruby-mode-map)
-  (add-to-list 'comint-output-filter-functions 'inf-ruby-output-filter)
+  (add-hook 'comint-output-filter-functions 'inf-ruby-output-filter nil t)
   (setq comint-get-old-input (function inf-ruby-get-old-input))
   (make-local-variable 'compilation-error-regexp-alist)
   (setq compilation-error-regexp-alist inf-ruby-error-regexp-alist)
@@ -153,9 +153,10 @@ to continue it."
 
 (defun inf-ruby-output-filter (output)
   "Check if the current prompt is a top-level prompt"
-  (setq inf-ruby-at-top-level-prompt-p
-        (string-match inf-ruby-first-prompt-pattern
-                      (car (last (split-string output "\n"))))))
+  (unless (zerop (length output))
+    (setq inf-ruby-at-top-level-prompt-p
+          (string-match inf-ruby-first-prompt-pattern
+                        (car (last (split-string output "\n")))))))
 
 ;; adapted from replace-in-string in XEmacs (subr.el)
 (defun inf-ruby-remove-in-string (str regexp)
