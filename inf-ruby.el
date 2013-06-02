@@ -329,12 +329,13 @@ Then switch to the process buffer."
     (replace-regexp-in-string "\n" "\\\\n"
       (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
 
-(defsubst inf-ruby-fix-completions-on-windows ()
+(defsubst inf-ruby-fix-completions-on-windows (completions)
   "On Windows, the string received by `accept-process-output'
 starts with the last line that was sent to the Ruby process.
 The reason for this is unknown. Remove this line from `completions'."
   (if (eq system-type 'windows-nt)
-    (setq completions (cdr completions))))
+      (cdr completions)
+    completions))
 
 (defun inf-ruby-completions (seed)
   "Return a list of completions for the line of ruby code starting with SEED."
@@ -347,7 +348,7 @@ The reason for this is unknown. Remove this line from `completions'."
     (while (and (not (string-match inf-ruby-prompt-pattern kept))
                 (accept-process-output proc 2)))
     (setq completions (butlast (split-string kept "\r?\n") 2))
-    (inf-ruby-fix-completions-on-windows)
+    (setq completions (inf-ruby-fix-completions-on-windows completions))
     (set-process-filter proc comint-filt)
     completions))
 
