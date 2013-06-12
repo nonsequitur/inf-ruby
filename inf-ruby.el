@@ -35,7 +35,7 @@
      "\\(\[[0-9]+\] \\)?[Pp]ry ?([^)]+)" ; Pry
      "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
      "^rbx-head"                         ; RVM continued
-     ;; Statement and nesting counters, common to the last three.
+     ;; Statement and nesting counters, common to the last four.
      "\\) ?[0-9:]* ?%s *\\)")
    "\\|")
   "Format string for the prompt regexp pattern.
