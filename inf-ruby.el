@@ -15,10 +15,18 @@
 ;; If you're installing manually, you'll need to:
 ;; * drop the file somewhere on your load path (perhaps ~/.emacs.d)
 ;; * Add the following lines to your .emacs file:
+;;
 ;;    (autoload 'inf-ruby "inf-ruby" "Run an inferior Ruby process" t)
 ;;    (autoload 'inf-ruby-setup-keybindings "inf-ruby" "" t)
 ;;    (eval-after-load 'ruby-mode
 ;;      '(add-hook 'ruby-mode-hook 'inf-ruby-setup-keybindings))
+;;
+;; Additionally, consider adding
+;;
+;;    (inf-ruby-switch-setup)
+;;
+;; to your init file to easily switch from common Ruby compilation
+;; modes to interact with a debugger.
 
 (require 'comint)
 (require 'compile)
@@ -390,6 +398,25 @@ Module used by readline when running irb through a terminal"
   (if (not command)
       (call-interactively 'indent-for-tab-command)
     (inf-ruby-complete command)))
+
+(defun inf-ruby-switch-from-compilation ()
+  "Make the buffer writable and switch to `inf-ruby-mode'.
+Recommended for use when the program being executed enters
+interactive mode, i.e. hits a debugger breakpoint."
+  (interactive)
+  (setq buffer-read-only nil)
+  (inf-ruby-mode))
+
+;;;###autoload
+(defun inf-ruby-switch-setup ()
+  "Modify `rspec-compilation-mode' and `ruby-compilation-mode'
+keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
+  (eval-after-load 'rspec-mode
+    '(define-key rspec-compilation-mode-map (kbd "C-x C-q")
+       'inf-ruby-switch-from-compilation))
+  (eval-after-load 'ruby-compilation
+    '(define-key ruby-compilation-mode-map (kbd "C-x C-q")
+       'inf-ruby-switch-from-compilation)))
 
 ;;;###autoload (inf-ruby-setup-keybindings)
 
