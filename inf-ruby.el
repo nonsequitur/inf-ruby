@@ -405,6 +405,7 @@ Recommended for use when the program being executed enters
 interactive mode, i.e. hits a debugger breakpoint."
   (interactive)
   (setq buffer-read-only nil)
+  (buffer-enable-undo)
   (inf-ruby-mode))
 
 ;;;###autoload
