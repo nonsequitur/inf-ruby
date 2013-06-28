@@ -39,6 +39,7 @@
   (mapconcat
    #'identity
    '("\\(^%s> .*\\)"                     ; Simple
+     "\\(^(rdb:1)\\)"                    ; Debugger
      "\\(^\\(irb([^)]+)"                 ; IRB default
      "\\(\[[0-9]+\] \\)?[Pp]ry ?([^)]+)" ; Pry
      "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
