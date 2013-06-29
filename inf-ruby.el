@@ -36,17 +36,18 @@
   "Which Ruby implementation to use if none is specified.")
 
 (defconst inf-ruby-prompt-format
-  (mapconcat
-   #'identity
-   '("\\(^%s> .*\\)"                     ; Simple
-     "\\(^(rdb:1)\\)"                    ; Debugger
-     "\\(^\\(irb([^)]+)"                 ; IRB default
-     "\\(\[[0-9]+\] \\)?[Pp]ry ?([^)]+)" ; Pry
-     "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
-     "^rbx-head"                         ; RVM continued
-     ;; Statement and nesting counters, common to the last four.
-     "\\) ?[0-9:]* ?%s *\\)")
-   "\\|")
+  (concat
+   (mapconcat
+    #'identity
+    '("\\(^%s> .*\\)"                     ; Simple
+      "\\(^(rdb:1)\\)"                    ; Debugger
+      "\\(^\\(irb([^)]+)"                 ; IRB default
+      "\\(\[[0-9]+\] \\)?[Pp]ry ?([^)]+)" ; Pry
+      "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
+      "^rbx-head\\)")                     ; RVM continued
+    "\\|")
+   ;; Statement and nesting counters, common to the last four.
+   " ?[0-9:]* ?%s *\\)")
   "Format string for the prompt regexp pattern.
 Two placeholders: first char in the Simple prompt, and the last
 graphical char in all other prompts.")
