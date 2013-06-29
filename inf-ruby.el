@@ -366,7 +366,8 @@ The reason for this is unknown. Remove this line from `completions'."
     (process-send-string
      proc
      (format (concat "if defined?(Pry.config) then "
-                     "completor = Pry.config.completer.build_completion_proc(binding)"
+                     "completor = Pry.config.completer"
+                     ".build_completion_proc(binding, defined?(_pry_) && _pry_)"
                      " elsif defined?(IRB::InputCompletor::CompletionProc) then "
                      "completor = IRB::InputCompletor::CompletionProc "
                      "end and "
