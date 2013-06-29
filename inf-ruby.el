@@ -369,8 +369,8 @@ The reason for this is unknown. Remove this line from `completions'."
                      "completor = Pry.config.completer.build_completion_proc(binding)"
                      " elsif defined?(IRB::InputCompletor::CompletionProc) then "
                      "completor = IRB::InputCompletor::CompletionProc "
-                     "end;"
-                     "puts completor.call('%s').compact if completor\n")
+                     "end and "
+                     "puts completor.call('%s').compact\n")
              (ruby-escape-single-quoted seed)))
     (while (and (not (string-match inf-ruby-prompt-pattern kept))
                 (accept-process-output proc 2)))
