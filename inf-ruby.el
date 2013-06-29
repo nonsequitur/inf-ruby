@@ -365,10 +365,10 @@ The reason for this is unknown. Remove this line from `completions'."
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
     (process-send-string
      proc
-     (format (concat "if defined?(Pry.config);"
+     (format (concat "if defined?(Pry.config) then "
                      "completor = Pry.config.completer.build_completion_proc(binding)"
-                     "elsif defined?(IRB::InputCompletor::CompletionProc);"
-                     "completor = IRB::InputCompletor::CompletionProc;"
+                     " elsif defined?(IRB::InputCompletor::CompletionProc) then "
+                     "completor = IRB::InputCompletor::CompletionProc "
                      "end;"
                      "puts completor.call('%s').compact if completor\n")
              (ruby-escape-single-quoted seed)))
