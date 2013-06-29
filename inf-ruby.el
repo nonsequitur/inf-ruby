@@ -414,6 +414,7 @@ interactive mode, i.e. hits a debugger breakpoint."
   (interactive)
   (setq buffer-read-only nil)
   (buffer-enable-undo)
+  (set-process-filter (get-buffer-process (current-buffer)) 'comint-output-filter)
   (inf-ruby-mode))
 
 ;;;###autoload
