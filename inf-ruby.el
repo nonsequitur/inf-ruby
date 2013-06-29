@@ -359,12 +359,19 @@ The reason for this is unknown. Remove this line from `completions'."
 
 (defun inf-ruby-completions (seed)
   "Return a list of completions for the line of ruby code starting with SEED."
-  (let* ((proc (get-buffer-process inf-ruby-buffer))
+  (let* ((proc (inf-ruby-proc))
 	 (comint-filt (process-filter proc))
 	 (kept "") completions)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
-    (process-send-string proc (format "puts IRB::InputCompletor::CompletionProc.call('%s').compact\n"
-                                      (ruby-escape-single-quoted seed)))
+    (process-send-string
+     proc
+     (format (concat "if defined?(Pry.config);"
+                     "completor = Pry.config.completer.build_completion_proc(binding)"
+                     "elsif defined?(IRB::InputCompletor::CompletionProc);"
+                     "completor = IRB::InputCompletor::CompletionProc;"
+                     "end;"
+                     "puts completor.call('%s').compact if completor\n")
+             (ruby-escape-single-quoted seed)))
     (while (and (not (string-match inf-ruby-prompt-pattern kept))
                 (accept-process-output proc 2)))
     (setq completions (butlast (split-string kept "\r?\n") 2))
