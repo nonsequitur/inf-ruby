@@ -2,11 +2,15 @@
 
 ;; Copyright (C) 1999-2008 Yukihiro Matsumoto, Nobuyoshi Nakada
 
-;; Author: Yukihiro Matsumoto, Nobuyoshi Nakada
+;; Author: Yukihiro Matsumoto
+;;         Nobuyoshi Nakada
+;;         Cornelius Mika <cornelius.mika@gmail.com>
+;;         Dmitry Gutov <dgutov@yandex.ru>
+;;         Kyle Hargraves <pd@krh.me>
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.2.6
+;; Version: 2.2.7
 
 ;;; Commentary:
 ;;
@@ -358,9 +362,10 @@ The reason for this is unknown. Remove this line from `completions'."
       (cdr completions)
     completions))
 
-(defun inf-ruby-completions (seed)
-  "Return a list of completions for the line of ruby code starting with SEED."
+(defun inf-ruby-completions (expr)
+  "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
+         (line (replace-regexp-in-string "\n$" "" (thing-at-point 'line)))
 	 (comint-filt (process-filter proc))
 	 (kept "") completions)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
@@ -368,12 +373,15 @@ The reason for this is unknown. Remove this line from `completions'."
      proc
      (format (concat "if defined?(Pry.config) then "
                      "completor = Pry.config.completer"
-                     ".build_completion_proc(binding, defined?(_pry_) && _pry_)"
+                     ".build_completion_proc(binding, defined?(_pry_) ? _pry_ : Pry.new)"
+                     " elsif defined?(Bond.agent) && Bond.started? then "
+                     "completor = Bond.agent"
                      " elsif defined?(IRB::InputCompletor::CompletionProc) then "
                      "completor = IRB::InputCompletor::CompletionProc "
                      "end and "
-                     "puts completor.call('%s').compact\n")
-             (ruby-escape-single-quoted seed)))
+                     "puts completor.call('%s', '%s').compact\n")
+             (ruby-escape-single-quoted expr)
+             (ruby-escape-single-quoted line)))
     (while (and (not (string-match inf-ruby-prompt-pattern kept))
                 (accept-process-output proc 2)))
     (setq completions (butlast (split-string kept "\r?\n") 2))
@@ -381,25 +389,39 @@ The reason for this is unknown. Remove this line from `completions'."
     (set-process-filter proc comint-filt)
     completions))
 
+(defconst inf-ruby-ruby-expr-break-chars " \t\n\"\'`><,;|&{(")
+
+(defun inf-ruby-completion-bounds-of-expr-at-point ()
+  (save-excursion
+    (let ((end (point)))
+      (skip-chars-backward (concat "^" inf-ruby-ruby-expr-break-chars))
+      (cons (point) end))))
+
+(defun inf-ruby-completion-expr-at-point ()
+  (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
+    (buffer-substring (car bounds) (cdr bounds))))
+
 (defun inf-ruby-completion-at-point ()
   (if inf-ruby-at-top-level-prompt-p
-      (let* ((curr (replace-regexp-in-string "\n$" "" (thing-at-point 'line)))
-             (completions (inf-ruby-completions curr)))
+      (let* ((expr (inf-ruby-completion-expr-at-point))
+             (completions (inf-ruby-completions expr)))
         (if completions
             (if (= (length completions) 1)
                 (car completions)
               (completing-read "possible completions: "
-                               completions nil t curr))))
+                               completions nil t expr))))
     (message "Completion aborted: Not at a top-level prompt")
     nil))
 
 (defun inf-ruby-complete (command)
-  "Complete the ruby code at point. Relies on the irb/completion
-Module used by readline when running irb through a terminal"
+  "Complete the Ruby code at point.
+Uses the first one available of Pry, Bond and the default IRB
+completion."
   (interactive (list (inf-ruby-completion-at-point)))
   (when command
-   (kill-whole-line 0)
-   (insert command)))
+    (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
+      (delete-region (car bounds) (cdr bounds)))
+    (insert command)))
 
 (defun inf-ruby-complete-or-tab (&optional command)
   "Either complete the ruby code at point or call
