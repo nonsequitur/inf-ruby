@@ -416,8 +416,13 @@ interactive mode, i.e. hits a debugger breakpoint."
   (interactive)
   (setq buffer-read-only nil)
   (buffer-enable-undo)
-  (set-process-filter (get-buffer-process (current-buffer)) 'comint-output-filter)
-  (inf-ruby-mode))
+  (inf-ruby-mode)
+  (let ((proc (get-buffer-process (current-buffer))))
+    (set-process-filter proc 'comint-output-filter)
+    (when (looking-back inf-ruby-prompt-pattern (line-beginning-position))
+      (let ((line (match-string 0)))
+        (delete-region (match-beginning 0) (point))
+        (comint-output-filter proc line)))))
 
 ;;;###autoload
 (defun inf-ruby-switch-setup ()
