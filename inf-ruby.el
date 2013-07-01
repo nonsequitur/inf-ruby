@@ -365,7 +365,8 @@ The reason for this is unknown. Remove this line from `completions'."
 (defun inf-ruby-completions (expr)
   "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
-         (line (replace-regexp-in-string "\n$" "" (thing-at-point 'line)))
+         (line (buffer-substring (save-excursion (beginning-of-thing 'line))
+                                 (point)))
 	 (comint-filt (process-filter proc))
 	 (kept "") completions)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
