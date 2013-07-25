@@ -10,7 +10,7 @@
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.2.7
+;; Version: 2.3.0
 
 ;;; Commentary:
 ;;
@@ -457,6 +457,83 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
   (eval-after-load 'ruby-compilation
     '(define-key ruby-compilation-mode-map (kbd "C-x C-q")
        'inf-ruby-switch-from-compilation)))
+
+(defvar inf-ruby-console-patterns-alist
+  '(("config/application.rb" . rails)
+    ("*.gemspec" . gem)
+    ("Gemfile" . default))
+  "Mapping from file name patterns to name symbols.
+`inf-ruby-console-auto' walks up from the current directory until
+one of the patterns matches, then calls `inf-ruby-console-NAME',
+passing it the found directory.")
+
+(defun inf-ruby-console-match (dir)
+  (catch 'type
+    (dolist (pair inf-ruby-console-patterns-alist)
+      (let ((default-directory dir))
+        (when (file-expand-wildcards (car pair))
+          (throw 'type (cdr pair)))))))
+
+;;;###autoload
+(defun inf-ruby-console-auto ()
+  "Automatically determine the appropriate Ruby console command
+and the directory to run it from."
+  (interactive)
+  (let* ((dir (locate-dominating-file default-directory
+                                      #'inf-ruby-console-match))
+         (type (inf-ruby-console-match dir))
+         (fun (intern (format "inf-ruby-console-%s" type))))
+    (unless type (error "No matching directory found"))
+    (funcall fun dir)))
+
+;;;###autoload
+(defun inf-ruby-console-rails (dir)
+  "Run Rails console in DIR."
+  (interactive "D")
+  (let ((default-directory dir))
+    (run-ruby "rails console" "rails")))
+
+;;;###autoload
+(defun inf-ruby-console-gem (dir)
+  "Run IRB console for the gem in DIR.
+The main module should be loaded automatically. If DIR contains a
+Gemfile, it should use the `gemspec' instruction."
+  (interactive "D")
+  (let ((default-directory dir))
+    (if (file-exists-p "Gemfile")
+        (run-ruby "bundle exec irb" "gem")
+      (unless (file-exists-p "lib")
+        (error "The directory must contain a 'lib' subdirectory"))
+      (let (files)
+        (dolist (item (directory-files "lib"))
+          (unless (file-directory-p item)
+            (setq files (cons item files))))
+        (run-ruby (concat "irb -I lib"
+                          ;; If there are several files under 'lib'
+                          ;; (unlikely), load them all.
+                          (mapconcat
+                           (lambda (file)
+                             (concat " -r " (file-name-sans-extension file)))
+                           files
+                           ""))
+                  "gem")))))
+
+;;;###autoload
+(defun inf-ruby-console-default (dir)
+  "Run racksh, custom console.rb, or just IRB, in DIR."
+  (interactive "D")
+  (let ((default-directory dir))
+    (unless (file-exists-p "Gemfile")
+      (error "The directory must contain a Gemfile"))
+    (cond
+     ((with-temp-buffer
+        (insert-file-contents "Gemfile")
+        (re-search-forward "[\"']racksh[\"']" nil t))
+      (run-ruby "bundle exec racksh" "racksh"))
+     ((file-exists-p "console.rb")
+      (run-ruby "ruby console.rb" "console.rb"))
+     (t
+      (run-ruby "bundle exec irb")))))
 
 ;;;###autoload (inf-ruby-setup-keybindings)
 
