@@ -534,7 +534,7 @@ Gemfile, it should use the `gemspec' instruction."
      ((file-exists-p "console.rb")
       (run-ruby "ruby console.rb" "console.rb"))
      (t
-      (run-ruby "bundle exec irb")))))
+      (run-ruby "bundle console")))))
 
 ;;;###autoload (inf-ruby-setup-keybindings)
 
