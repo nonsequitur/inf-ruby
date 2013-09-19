@@ -70,6 +70,7 @@ graphical char in all other prompts.")
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
     (define-key map (kbd "TAB") 'inf-ruby-complete)
+    (define-key map (kbd "C-x C-q") 'inf-ruby-switch-to-compilation)
     map)
   "Mode map for inf-ruby-mode")
 
@@ -160,12 +161,14 @@ Paragraphs are separated only by blank lines.  # start comments.
 If you accidentally suspend your process, use \\[comint-continue-subjob]
 to continue it."
   (interactive)
-  (comint-mode)
+  (let ((orig-mode-line-process mode-line-process))
+    (comint-mode)
+    (when orig-mode-line-process
+      (setq mode-line-process orig-mode-line-process)))
   (setq comint-prompt-regexp inf-ruby-prompt-pattern)
   (ruby-mode-variables)
   (setq major-mode 'inf-ruby-mode)
   (setq mode-name "Inf-Ruby")
-  (setq mode-line-process '(":%s"))
   (use-local-map inf-ruby-mode-map)
   (add-hook 'comint-output-filter-functions 'inf-ruby-output-filter nil t)
   (setq comint-get-old-input (function inf-ruby-get-old-input))
@@ -432,6 +435,9 @@ completion."
       (call-interactively 'indent-for-tab-command)
     (inf-ruby-complete command)))
 
+(defvar inf-ruby-orig-compilation-mode nil
+  "Original compilation mode before switching to `inf-ruby-mode'.")
+
 (defun inf-ruby-switch-from-compilation ()
   "Make the buffer writable and switch to `inf-ruby-mode'.
 Recommended for use when the program being executed enters
@@ -439,13 +445,26 @@ interactive mode, i.e. hits a debugger breakpoint."
   (interactive)
   (setq buffer-read-only nil)
   (buffer-enable-undo)
-  (inf-ruby-mode)
+  (let ((mode major-mode))
+    (inf-ruby-mode)
+    (make-local-variable 'inf-ruby-orig-compilation-mode)
+    (setq inf-ruby-orig-compilation-mode mode))
   (let ((proc (get-buffer-process (current-buffer))))
-    (set-process-filter proc 'comint-output-filter)
+    (when proc
+      (set-process-filter proc 'comint-output-filter))
     (when (looking-back inf-ruby-prompt-pattern (line-beginning-position))
       (let ((line (match-string 0)))
         (delete-region (match-beginning 0) (point))
         (comint-output-filter proc line)))))
+
+(defun inf-ruby-switch-to-compilation ()
+  "Switch to compilation mode before switching to `inf-ruby-mode'."
+  (interactive)
+  (if inf-ruby-orig-compilation-mode
+      (let ((orig-mode-line-process mode-line-process))
+	(funcall inf-ruby-orig-compilation-mode)
+	(setq mode-line-process orig-mode-line-process))
+    (toggle-read-only)))
 
 ;;;###autoload
 (defun inf-ruby-switch-setup ()
