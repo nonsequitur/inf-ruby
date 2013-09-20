@@ -70,7 +70,7 @@ graphical char in all other prompts.")
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
     (define-key map (kbd "TAB") 'inf-ruby-complete)
-    (define-key map (kbd "C-x C-q") 'inf-ruby-switch-to-compilation)
+    (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
     map)
   "Mode map for inf-ruby-mode")
 
@@ -457,13 +457,15 @@ interactive mode, i.e. hits a debugger breakpoint."
         (delete-region (match-beginning 0) (point))
         (comint-output-filter proc line)))))
 
-(defun inf-ruby-switch-to-compilation ()
-  "Switch to compilation mode before switching to `inf-ruby-mode'."
+(defun inf-ruby-maybe-switch-to-compilation ()
+  "Switch to compilation mode this buffer was in before
+`inf-ruby-switch-from-compilation' was called, if it was.
+Otherwise, just toggle read-only status."
   (interactive)
   (if inf-ruby-orig-compilation-mode
       (let ((orig-mode-line-process mode-line-process))
-	(funcall inf-ruby-orig-compilation-mode)
-	(setq mode-line-process orig-mode-line-process))
+        (funcall inf-ruby-orig-compilation-mode)
+        (setq mode-line-process orig-mode-line-process))
     (toggle-read-only)))
 
 ;;;###autoload
