@@ -22,8 +22,7 @@
 ;;
 ;;    (autoload 'inf-ruby "inf-ruby" "Run an inferior Ruby process" t)
 ;;    (autoload 'inf-ruby-setup-keybindings "inf-ruby" "" t)
-;;    (eval-after-load 'ruby-mode
-;;      '(add-hook 'ruby-mode-hook 'inf-ruby-setup-keybindings))
+;;    (eval-after-load 'ruby-mode '(inf-ruby-setup-keybindings))
 ;;
 ;; Additionally, consider adding
 ;;
@@ -557,7 +556,7 @@ Gemfile, it should use the `gemspec' instruction."
      (t
       (run-ruby "bundle console")))))
 
-;;;###autoload (inf-ruby-setup-keybindings)
+;;;###autoload (eval-after-load 'ruby-mode '(inf-ruby-setup-keybindings))
 
 (provide 'inf-ruby)
 ;;; inf-ruby.el ends here
