@@ -10,7 +10,7 @@
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.3.0
+;; Version: 2.3.1
 
 ;;; Commentary:
 ;;
@@ -21,13 +21,18 @@
 ;; * Add the following lines to your .emacs file:
 ;;
 ;;    (autoload 'inf-ruby "inf-ruby" "Run an inferior Ruby process" t)
-;;    (autoload 'inf-ruby-setup-keybindings "inf-ruby" "" t)
-;;    (eval-after-load 'ruby-mode
-;;      '(add-hook 'ruby-mode-hook 'inf-ruby-setup-keybindings))
+;;    (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+;;
+;; Or, for enh-ruby-mode:
+;;
+;;    (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+;;
+;; Installation via ELPA interface does the above for you
+;; automatically.
 ;;
 ;; Additionally, consider adding
 ;;
-;;    (inf-ruby-switch-setup)
+;;    (add-hook 'after-init-hook 'inf-ruby-switch-setup)
 ;;
 ;; to your init file to easily switch from common Ruby compilation
 ;; modes to interact with a debugger.
@@ -82,6 +87,7 @@ graphical char in all other prompts.")
     ("macruby"  . "macirb -r irb/completion"))
   "An alist of ruby implementations to irb executable names.")
 
+;;;###autoload
 (defvar ruby-source-modes '(ruby-mode enh-ruby-mode)
   "Used to determine if a buffer contains Ruby source code.
 If it's loaded into a buffer that is in one of these major modes, it's
@@ -103,8 +109,10 @@ next one.")
 ;;;###autoload
 (defun inf-ruby-setup-keybindings ()
   "Hook up `inf-ruby-minor-mode' to each of `ruby-source-modes'."
-  (dolist (mode ruby-source-modes)
-    (add-hook (intern (format "%s-hook" mode)) 'inf-ruby-minor-mode)))
+  (warn "`inf-ruby-setup-keybindings' is deprecated, please don't use it anymore.")
+  (warn "If you're using `inf-ruby' from Git, please look up the new usage instructions."))
+
+(make-obsolete 'inf-ruby-setup-keybindings 'add-hook "2.3.1")
 
 (defvar inf-ruby-minor-mode-map
   (let ((map (make-sparse-keymap)))
@@ -557,7 +565,7 @@ Gemfile, it should use the `gemspec' instruction."
      (t
       (run-ruby "bundle console")))))
 
-;;;###autoload (inf-ruby-setup-keybindings)
+;;;###autoload (dolist (mode ruby-source-modes) (add-hook (intern (format "%s-hook" mode)) 'inf-ruby-minor-mode))
 
 (provide 'inf-ruby)
 ;;; inf-ruby.el ends here
