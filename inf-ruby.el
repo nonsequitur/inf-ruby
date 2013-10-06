@@ -321,7 +321,7 @@ Must not contain ruby meta characters.")
   "Switch to the ruby process buffer.
 With argument, positions cursor at end of buffer."
   (interactive "P")
-  (if (get-buffer inf-ruby-buffer)
+  (if (and inf-ruby-buffer (get-buffer inf-ruby-buffer))
       (pop-to-buffer inf-ruby-buffer)
     (error "No current process buffer. See variable inf-ruby-buffer."))
   (cond (eob-p
