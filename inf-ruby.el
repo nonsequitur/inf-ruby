@@ -131,7 +131,11 @@ next one.")
 
 ;;;###autoload
 (define-minor-mode inf-ruby-minor-mode
-  "Minor mode for interacting with the inferior process buffer."
+  "Minor mode for interacting with the inferior process buffer.
+
+The following commands are available:
+
+\\{inf-ruby-minor-mode-map}"
   :lighter "" :keymap inf-ruby-minor-mode-map)
 
 (defvar inf-ruby-buffer nil "Current irb process buffer.")
