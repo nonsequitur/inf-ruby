@@ -1,4 +1,4 @@
-;;; inf-ruby.el --- Run a ruby process in a buffer
+;;; inf-ruby.el --- Run a Ruby process in a buffer
 
 ;; Copyright (C) 1999-2008 Yukihiro Matsumoto, Nobuyoshi Nakada
 
@@ -14,7 +14,7 @@
 
 ;;; Commentary:
 ;;
-;; inf-ruby.el provides a REPL buffer connected to an IRB subprocess.
+;; inf-ruby.el provides a REPL buffer connected to a Ruby subprocess.
 ;;
 ;; If you're installing manually, you'll need to:
 ;; * drop the file somewhere on your load path (perhaps ~/.emacs.d)
@@ -138,20 +138,20 @@ The following commands are available:
 \\{inf-ruby-minor-mode-map}"
   :lighter "" :keymap inf-ruby-minor-mode-map)
 
-(defvar inf-ruby-buffer nil "Current irb process buffer.")
+(defvar inf-ruby-buffer nil "Current Ruby process buffer.")
 
 (defun inf-ruby-mode ()
-  "Major mode for interacting with an inferior Ruby (irb) process.
+  "Major mode for interacting with an inferior Ruby REPL process.
 
-The following commands are available:
-\\{inf-ruby-mode-map}
+A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
 
-A Ruby process can be fired up with M-x inf-ruby.
+To launch a REPL with project-specific console instead, type <kbd>M-x inf-ruby-console-auto</kbd>.
+It recognizes several project types, including Rails, gems and anything with `racksh` in their Gemfile.
 
 Customization: When entered, this mode runs `comint-mode-hook' and
 `inf-ruby-mode-hook' (in that order).
 
-You can send text to the inferior ruby process from other buffers containing
+You can send text to the inferior Ruby process from other buffers containing
 Ruby source.
 
     `ruby-switch-to-inf' switches the current buffer to the ruby process buffer.
@@ -161,17 +161,21 @@ Ruby source.
         switch to the ruby process buffer after sending their text.
 
 Commands:
-Return after the end of the process' output sends the text from the
+`RET' after the end of the process' output sends the text from the
     end of process to point.
-Return before the end of the process' output copies the sexp ending at point
+`RET' before the end of the process' output copies the sexp ending at point
     to the end of the process' output, and sends it.
-Delete converts tabs to spaces as it moves back.
-Tab indents for ruby; with argument, shifts rest
+`DEL' converts tabs to spaces as it moves back.
+`TAB' indents for ruby; with argument, shifts rest
     of expression rigidly with the current line.
-C-M-q does Tab on each line starting within following expression.
+`C-M-q' does `TAB' on each line starting within following expression.
 Paragraphs are separated only by blank lines.  # start comments.
 If you accidentally suspend your process, use \\[comint-continue-subjob]
-to continue it."
+to continue it.
+
+The following commands are available:
+
+\\{inf-ruby-mode-map}"
   (interactive)
   (let ((orig-mode-line-process mode-line-process))
     (comint-mode)

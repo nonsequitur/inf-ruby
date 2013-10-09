@@ -1,4 +1,4 @@
-`inf-ruby.el` provides a REPL buffer connected to an IRB subprocess.
+`inf-ruby.el` provides a REPL buffer connected to a Ruby subprocess.
 
 ## Installation
 
@@ -8,34 +8,19 @@
 you will need to get [package.el](http://bit.ly/pkg-el23) yourself if you wish to use it.
 
 `inf-ruby` is available on both major `package.el` community
-maintained repos -
+maintained repos:
 [Marmalade](http://marmalade-repo.org/packages/inf-ruby) and
 [MELPA](http://melpa.milkbox.net).
 
-If you're not already using Marmalade, add this to your
-`~/.emacs.d/init.el` (or equivalent) and load it with <kbd>M-x eval-buffer</kbd>.
-
-```lisp
-(require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(package-initialize)
-```
-
-For MELPA the code you need to add is:
-
-```lisp
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
-```
+If you're not already using one of them, follow their installation instructions:
+[Marmalade](http://marmalade-repo.org/),
+[MELPA](http://melpa.milkbox.net/#/getting-started).
 
 And then you can install `inf-ruby` with the following command:
 
 <kbd>M-x package-install [RET] inf-ruby [RET]</kbd>
 
-or by adding this bit of Emacs Lisp code to your Emacs initialization file(`.emacs` or `init.el`):
+or by adding this bit of Emacs Lisp code to your Emacs initialization file (`.emacs` or `init.el`):
 
 ```lisp
 (unless (package-installed-p 'inf-ruby)
@@ -89,12 +74,15 @@ Prelude user you can start using it right away.
 
 ## Usage
 
-A Ruby process can be fired up with <kbd>M-x inf-ruby</kbd>.
+A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
+
+To launch a REPL with project-specific console instead, type <kbd>M-x inf-ruby-console-auto</kbd>.
+It recognizes several project types, including Rails, gems and anything with `racksh` in their Gemfile.
 
 Customization: When entered, this mode runs `comint-mode-hook` and
 `inf-ruby-mode-hook` (in that order).
 
-You can send text to the inferior ruby process from other buffers containing
+You can send text to the inferior Ruby process from other buffers containing
 Ruby source.
 
 * `ruby-switch-to-inf` switches the current buffer to the ruby process buffer.
@@ -104,32 +92,19 @@ Ruby source.
 
 Commands:
 
-* Return after the end of the process' output sends the text from the
+* <kbd>RET</kbd> after the end of the process' output sends the text from the
 end of process to point.
-* Return before the end of the process' output copies the sexp ending at point
+* <kbd>RET</kbd> before the end of the process' output copies the sexp ending at point
 to the end of the process' output, and sends it.
-* Delete converts tabs to spaces as it moves back.
-* Tab indents for ruby; with argument, shifts rest
+* <kbd>DEL</kbd> converts tabs to spaces as it moves back.
+* <kbd>TAB</kbd> indents for Ruby; with argument, shifts rest
 of expression rigidly with the current line.
-* <kbd>C-M-q</kbd> does <kbd>Tab</kbd> on each line starting within following expression.
-* Paragraphs are separated only by blank lines.  `#`start comments.
+* <kbd>C-M-q</kbd> does <kbd>TAB</kbd> on each line starting within following expression.
+* Paragraphs are separated only by blank lines.  `#` start comments.
 * If you accidentally suspend your process, use
 `comint-continue-subjob` to continue it.
 
 ### Keymap
 
-Here's a list of the keybindings defined by `inf-ruby-minor-mode`.
-
-Keyboard shortcut                    | Command
--------------------------------------|-------------------------------
-<kbd>C-M-x</kbd>                     | ruby-send-definition
-<kbd>C-x C-e</kbd>                   | ruby-send-last-sexp
-<kbd>C-c C-b</kbd>                   | ruby-send-block
-<kbd>C-c M-b</kbd>                   | ruby-send-block-and-go
-<kbd>C-c C-x</kbd>                   | ruby-send-definition
-<kbd>C-c M-x</kbd>                   | ruby-send-definition-and-go
-<kbd>C-c C-r</kbd>                   | ruby-send-region
-<kbd>C-c M-r</kbd>                   | ruby-send-region-and-go
-<kbd>C-c C-z</kdb>                   | ruby-switch-to-inf
-<kbd>C-c C-l</kbd>                   | ruby-load-file
-<kbd>C-c C-s</kbd>                   | inf-ruby
+To see the list of the keybindings defined by `inf-ruby-minor-mode`,
+type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
