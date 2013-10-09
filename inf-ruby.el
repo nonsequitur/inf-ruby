@@ -95,7 +95,7 @@ graphical char in all other prompts.")
     (define-key map (kbd "TAB") 'inf-ruby-complete)
     (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
     map)
-  "Mode map for inf-ruby-mode")
+  "Mode map for inf-ruby-mode.")
 
 (defvar inf-ruby-implementations
   '(("ruby"     . "irb --prompt default -r irb/completion")
@@ -163,8 +163,10 @@ The following commands are available:
 
 A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
 
-To launch a REPL with project-specific console instead, type <kbd>M-x inf-ruby-console-auto</kbd>.
-It recognizes several project types, including Rails, gems and anything with `racksh` in their Gemfile.
+To launch a REPL with project-specific console instead, type
+<kbd>M-x inf-ruby-console-auto</kbd>.  It recognizes several
+project types, including Rails, gems and anything with `racksh`
+in their Gemfile.
 
 Customization: When entered, this mode runs `comint-mode-hook' and
 `inf-ruby-mode-hook' (in that order).
@@ -231,7 +233,7 @@ The following commands are available:
     (concat rtn-str (substring str start))))
 
 (defun inf-ruby-get-old-input ()
-  "Snarf the sexp ending at point"
+  "Snarf the sexp ending at point."
   (save-excursion
     (let ((end (point)))
       (re-search-backward inf-ruby-first-prompt-pattern)
@@ -242,7 +244,7 @@ The following commands are available:
 (defun inf-ruby (&optional impl)
   "Run an inferior Ruby process in a buffer.
 With prefix argument, prompts for which Ruby implementation
-\(from the list `inf-ruby-implementations') to use. Runs the
+\(from the list `inf-ruby-implementations') to use.  Runs the
 hooks `inf-ruby-mode-hook' \(after the `comint-mode-hook' is
 run)."
 
@@ -277,7 +279,9 @@ of `ruby-program-name').  Runs the hooks `inferior-ruby-mode-hook'
   (pop-to-buffer (setq inf-ruby-buffer (format "*%s*" name))))
 
 (defun inf-ruby-proc ()
-  "Returns the current IRB process. See variable inf-ruby-buffer."
+  "Returns the current IRB process.
+
+See variable `inf-ruby-buffer'."
   (or (get-buffer-process (if (eq major-mode 'inf-ruby-mode)
                               (current-buffer)
                             inf-ruby-buffer))
@@ -551,7 +555,7 @@ and the directory to run it from."
 ;;;###autoload
 (defun inf-ruby-console-gem (dir)
   "Run IRB console for the gem in DIR.
-The main module should be loaded automatically. If DIR contains a
+The main module should be loaded automatically.  If DIR contains a
 Gemfile, it should use the `gemspec' instruction."
   (interactive "D")
   (let* ((default-directory dir)
