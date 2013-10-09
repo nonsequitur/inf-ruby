@@ -485,11 +485,12 @@ Otherwise, just toggle read-only status."
   (interactive)
   (if inf-ruby-orig-compilation-mode
       (let ((orig-mode-line-process mode-line-process)
-            (proc (get-buffer-process (current-buffer))))
+            (proc (get-buffer-process (current-buffer)))
+            (filter inf-ruby-orig-process-filter))
         (funcall inf-ruby-orig-compilation-mode)
         (setq mode-line-process orig-mode-line-process)
         (when proc
-          (set-process-filter proc inf-ruby-orig-process-filter)))
+          (set-process-filter proc filter)))
     (toggle-read-only)))
 
 ;;;###autoload
