@@ -386,8 +386,8 @@ The reason for this is unknown. Remove this line from `completions'."
   (let* ((proc (inf-ruby-proc))
          (line (buffer-substring (save-excursion (beginning-of-thing 'line))
                                  (point)))
-	 (comint-filt (process-filter proc))
-	 (kept "") completions)
+         (comint-filt (process-filter proc))
+         (kept "") completions)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
     (process-send-string
      proc
@@ -454,6 +454,9 @@ completion."
 (defvar inf-ruby-orig-compilation-mode nil
   "Original compilation mode before switching to `inf-ruby-mode'.")
 
+(defvar inf-ruby-orig-process-filter nil
+  "Original process filter before switching to `inf-ruby-mode`.")
+
 (defun inf-ruby-switch-from-compilation ()
   "Make the buffer writable and switch to `inf-ruby-mode'.
 Recommended for use when the program being executed enters
@@ -467,6 +470,8 @@ interactive mode, i.e. hits a debugger breakpoint."
     (setq inf-ruby-orig-compilation-mode mode))
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
+      (make-local-variable 'inf-ruby-orig-process-filter)
+      (setq inf-ruby-orig-process-filter (process-filter proc))
       (set-process-filter proc 'comint-output-filter))
     (when (looking-back inf-ruby-prompt-pattern (line-beginning-position))
       (let ((line (match-string 0)))
@@ -479,9 +484,12 @@ interactive mode, i.e. hits a debugger breakpoint."
 Otherwise, just toggle read-only status."
   (interactive)
   (if inf-ruby-orig-compilation-mode
-      (let ((orig-mode-line-process mode-line-process))
+      (let ((orig-mode-line-process mode-line-process)
+            (proc (get-buffer-process (current-buffer))))
         (funcall inf-ruby-orig-compilation-mode)
-        (setq mode-line-process orig-mode-line-process))
+        (setq mode-line-process orig-mode-line-process)
+        (when proc
+          (set-process-filter proc inf-ruby-orig-process-filter)))
     (toggle-read-only)))
 
 ;;;###autoload
