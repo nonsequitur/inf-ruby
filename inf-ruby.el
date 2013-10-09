@@ -36,6 +36,8 @@
 ;;
 ;; to your init file to easily switch from common Ruby compilation
 ;; modes to interact with a debugger.
+;;
+;;; Code:
 
 (require 'comint)
 (require 'compile)
