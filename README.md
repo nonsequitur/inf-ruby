@@ -1,4 +1,4 @@
-`inf-ruby.el` provides a REPL buffer connected to a Ruby subprocess.
+`inf-ruby` provides a REPL buffer connected to a Ruby subprocess.
 
 ## Installation
 

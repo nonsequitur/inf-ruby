@@ -14,7 +14,7 @@
 
 ;;; Commentary:
 ;;
-;; inf-ruby.el provides a REPL buffer connected to a Ruby subprocess.
+;; inf-ruby provides a REPL buffer connected to a Ruby subprocess.
 ;;
 ;; If you're installing manually, you'll need to:
 ;; * drop the file somewhere on your load path (perhaps ~/.emacs.d)
