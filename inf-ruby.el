@@ -386,8 +386,8 @@ The reason for this is unknown. Remove this line from `completions'."
   (let* ((proc (inf-ruby-proc))
          (line (buffer-substring (save-excursion (beginning-of-thing 'line))
                                  (point)))
-	 (comint-filt (process-filter proc))
-	 (kept "") completions)
+         (comint-filt (process-filter proc))
+         (kept "") completions)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
     (process-send-string
      proc
@@ -482,7 +482,7 @@ Otherwise, just toggle read-only status."
       (let ((orig-mode-line-process mode-line-process))
         (funcall inf-ruby-orig-compilation-mode)
         (setq mode-line-process orig-mode-line-process))
-    (toggle-read-only)))
+    (call-interactively 'toggle-read-only)))
 
 ;;;###autoload
 (defun inf-ruby-switch-setup ()
