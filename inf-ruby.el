@@ -40,6 +40,7 @@
 (require 'comint)
 (require 'compile)
 (require 'ruby-mode)
+(require 'thingatpt)
 
 (defvar inf-ruby-default-implementation "ruby"
   "Which Ruby implementation to use if none is specified.")
