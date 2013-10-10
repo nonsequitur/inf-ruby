@@ -102,7 +102,8 @@ graphical char in all other prompts.")
     ("jruby"    . "jruby -S irb --prompt default -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("yarv"     . "irb1.9 -r irb/completion")
-    ("macruby"  . "macirb -r irb/completion"))
+    ("macruby"  . "macirb -r irb/completion")
+    ("pry"      . "pry"))
   "An alist of ruby implementations to irb executable names.")
 
 ;;;###autoload
