@@ -86,7 +86,7 @@ graphical char in all other prompts.")
   "Prompt regex pattern of Ruby interpreter.")
 
 (defvar inf-ruby-mode-hook nil
-  "Hook for customizing inf-ruby mode.")
+  "Hook for customizing `inf-ruby-mode'.")
 
 (defvar inf-ruby-mode-map
   (let ((map (copy-keymap comint-mode-map)))
@@ -95,7 +95,7 @@ graphical char in all other prompts.")
     (define-key map (kbd "TAB") 'inf-ruby-complete)
     (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
     map)
-  "Mode map for inf-ruby-mode.")
+  "Mode map for `inf-ruby-mode'.")
 
 (defvar inf-ruby-implementations
   '(("ruby"     . "irb --prompt default -r irb/completion")
@@ -114,7 +114,7 @@ Used by these commands to determine defaults.")
 
 (defvar ruby-prev-l/c-dir/file nil
   "Caches the last (directory . file) pair.
-Caches the last pair used in the last ruby-load-file command.
+Caches the last pair used in the last `ruby-load-file' command.
 Used for determining the default in the
 next one.")
 
@@ -161,11 +161,11 @@ The following commands are available:
 (defun inf-ruby-mode ()
   "Major mode for interacting with an inferior Ruby REPL process.
 
-A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
+A simple IRB process can be fired up with \\[inf-ruby].
 
 To launch a REPL with project-specific console instead, type
-<kbd>M-x inf-ruby-console-auto</kbd>.  It recognizes several
-project types, including Rails, gems and anything with `racksh`
+\\[inf-ruby-console-auto].  It recognizes several
+project types, including Rails, gems and anything with `racksh'
 in their Gemfile.
 
 Customization: When entered, this mode runs `comint-mode-hook' and
@@ -186,8 +186,7 @@ Commands:
 `RET' before the end of the process' output copies the sexp ending at point
     to the end of the process' output, and sends it.
 `DEL' converts tabs to spaces as it moves back.
-`TAB' indents for ruby; with argument, shifts rest
-    of expression rigidly with the current line.
+`TAB' completes the input at point. IRB, Pry and Bond completion is supported.
 `C-M-q' does `TAB' on each line starting within following expression.
 Paragraphs are separated only by blank lines.  # start comments.
 If you accidentally suspend your process, use \\[comint-continue-subjob]
@@ -216,7 +215,7 @@ The following commands are available:
   (run-hooks 'inf-ruby-mode-hook))
 
 (defun inf-ruby-output-filter (output)
-  "Check if the current prompt is a top-level prompt"
+  "Check if the current prompt is a top-level prompt."
   (unless (zerop (length output))
     (setq inf-ruby-at-top-level-prompt-p
           (string-match inf-ruby-first-prompt-pattern
@@ -279,7 +278,7 @@ of `ruby-program-name').  Runs the hooks `inferior-ruby-mode-hook'
   (pop-to-buffer (setq inf-ruby-buffer (format "*%s*" name))))
 
 (defun inf-ruby-proc ()
-  "Returns the current IRB process.
+  "Return the current inferior Ruby process.
 
 See variable `inf-ruby-buffer'."
   (or (get-buffer-process (if (eq major-mode 'inf-ruby-mode)
@@ -353,7 +352,7 @@ With argument, positions cursor at end of buffer."
   (interactive "P")
   (if (and inf-ruby-buffer (get-buffer inf-ruby-buffer))
       (pop-to-buffer inf-ruby-buffer)
-    (error "No current process buffer. See variable inf-ruby-buffer."))
+    (error "No current process buffer, see variable inf-ruby-buffer"))
   (cond (eob-p
          (push-mark)
          (goto-char (point-max)))))
@@ -391,14 +390,16 @@ Then switch to the process buffer."
                                               "\"\)\n")))
 
 (defun ruby-escape-single-quoted (str)
+  "Escape single quotes, double quotes and newlines in STR."
   (replace-regexp-in-string "'" "\\\\'"
     (replace-regexp-in-string "\n" "\\\\n"
       (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
 
 (defsubst inf-ruby-fix-completions-on-windows (completions)
-  "On Windows, the string received by `accept-process-output'
-starts with the last line that was sent to the Ruby process.
-The reason for this is unknown. Remove this line from `completions'."
+  "Maybe remove the first item from COMPLETIONS.
+On Windows, the string received by `accept-process-output' starts
+with the last line that was sent to the Ruby process because the
+subprocess echoes input."
   (if (eq system-type 'windows-nt)
       (cdr completions)
     completions))
@@ -434,16 +435,20 @@ The reason for this is unknown. Remove this line from `completions'."
 (defconst inf-ruby-ruby-expr-break-chars " \t\n\"\'`><,;|&{(")
 
 (defun inf-ruby-completion-bounds-of-expr-at-point ()
+  "Return bounds of expression at point to complete."
   (save-excursion
     (let ((end (point)))
       (skip-chars-backward (concat "^" inf-ruby-ruby-expr-break-chars))
       (cons (point) end))))
 
 (defun inf-ruby-completion-expr-at-point ()
+  "Return expression at point to complete."
   (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
     (buffer-substring (car bounds) (cdr bounds))))
 
 (defun inf-ruby-completion-at-point ()
+  "Retrieve the list of completions and prompt the user.
+Returns the selected completion or nil."
   (if inf-ruby-at-top-level-prompt-p
       (let* ((expr (inf-ruby-completion-expr-at-point))
              (completions (inf-ruby-completions expr)))
@@ -455,23 +460,28 @@ The reason for this is unknown. Remove this line from `completions'."
     (message "Completion aborted: Not at a top-level prompt")
     nil))
 
-(defun inf-ruby-complete (command)
+(defun inf-ruby-complete ()
   "Complete the Ruby code at point.
 Uses the first one available of Pry, Bond and the default IRB
 completion."
-  (interactive (list (inf-ruby-completion-at-point)))
-  (when command
-    (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
-      (delete-region (car bounds) (cdr bounds)))
-    (insert command)))
+  (interactive)
+  (let ((replacement (inf-ruby-completion-at-point)))
+    (when replacement
+      (inf-ruby-complete-replace-expr replacement))))
 
-(defun inf-ruby-complete-or-tab (&optional command)
-  "Either complete the ruby code at point or call
-`indent-for-tab-command' if no completion is available."
-  (interactive (list (inf-ruby-completion-at-point)))
-  (if (not command)
-      (call-interactively 'indent-for-tab-command)
-    (inf-ruby-complete command)))
+(defun inf-ruby-complete-replace-expr (str)
+  "Replace expression at point with STR."
+  (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
+    (delete-region (car bounds) (cdr bounds)))
+  (insert str))
+
+(defun inf-ruby-complete-or-tab ()
+  "Complete the Ruby code at point or call `indent-for-tab-command'."
+  (interactive)
+  (let ((replacement (inf-ruby-completion-at-point)))
+    (if (not replacement)
+        (call-interactively 'indent-for-tab-command)
+      (inf-ruby-complete-replace-expr replacement))))
 
 (defvar inf-ruby-orig-compilation-mode nil
   "Original compilation mode before switching to `inf-ruby-mode'.")
@@ -536,6 +546,7 @@ one of the patterns matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
 (defun inf-ruby-console-match (dir)
+  "Find matching console command for DIR, if any."
   (catch 'type
     (dolist (pair inf-ruby-console-patterns-alist)
       (let ((default-directory dir))
@@ -544,8 +555,9 @@ passing it the found directory.")
 
 ;;;###autoload
 (defun inf-ruby-console-auto ()
-  "Automatically determine the appropriate Ruby console command
-and the directory to run it from."
+  "Run the appropriate Ruby console command.
+The command and and the directory to run it from are detected
+automatically."
   (interactive)
   (let* ((dir (locate-dominating-file default-directory
                                       #'inf-ruby-console-match))

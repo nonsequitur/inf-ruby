@@ -97,8 +97,7 @@ end of process to point.
 * <kbd>RET</kbd> before the end of the process' output copies the sexp ending at point
 to the end of the process' output, and sends it.
 * <kbd>DEL</kbd> converts tabs to spaces as it moves back.
-* <kbd>TAB</kbd> indents for Ruby; with argument, shifts rest
-of expression rigidly with the current line.
+* <kbd>TAB</kbd> completes the input at point. IRB, Pry and Bond completion is supported.
 * <kbd>C-M-q</kbd> does <kbd>TAB</kbd> on each line starting within following expression.
 * Paragraphs are separated only by blank lines.  `#` start comments.
 * If you accidentally suspend your process, use
