@@ -275,8 +275,7 @@ of `ruby-program-name').  Runs the hooks `inferior-ruby-mode-hook'
       (let ((commandlist (split-string-and-unquote command))
             (process-environment process-environment))
         ;; http://debbugs.gnu.org/15775
-        (unless (getenv "PAGER")
-          (setenv "PAGER" (executable-find "cat")))
+        (setenv "PAGER" (executable-find "cat"))
         (set-buffer (apply 'make-comint name (car commandlist)
                            nil (cdr commandlist)))
         (inf-ruby-mode)))
