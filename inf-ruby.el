@@ -296,7 +296,9 @@ See variable `inf-ruby-buffer'."
   "Template for irb here document terminator.
 Must not contain ruby meta characters.")
 
-(defconst inf-ruby-eval-binding "IRB.conf[:MAIN_CONTEXT].workspace.binding")
+(defconst inf-ruby-eval-binding
+  (concat "(IRB.conf[:MAIN_CONTEXT] && IRB.conf[:MAIN_CONTEXT].workspace.binding) || "
+          "(defined?(Pry) && Pry.toplevel_binding)"))
 
 (defconst ruby-eval-separator "")
 
