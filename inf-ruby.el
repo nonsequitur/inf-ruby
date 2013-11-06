@@ -414,26 +414,30 @@ subprocess echoes input."
          (line (buffer-substring (save-excursion (beginning-of-thing 'line))
                                  (point)))
          (comint-filt (process-filter proc))
-         (kept "") completions)
+         (kept "") completions
+         ;; Guard against running completions in parallel:
+         inf-ruby-at-top-level-prompt-p)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
-    (process-send-string
-     proc
-     (format (concat "if defined?(Pry.config) then "
-                     "completor = Pry.config.completer"
-                     ".build_completion_proc(binding, defined?(_pry_) ? _pry_ : Pry.new)"
-                     " elsif defined?(Bond.agent) && Bond.started? then "
-                     "completor = Bond.agent"
-                     " elsif defined?(IRB::InputCompletor::CompletionProc) then "
-                     "completor = IRB::InputCompletor::CompletionProc "
-                     "end and "
-                     "puts completor.call('%s', '%s').compact\n")
-             (ruby-escape-single-quoted expr)
-             (ruby-escape-single-quoted line)))
-    (while (and (not (string-match inf-ruby-prompt-pattern kept))
-                (accept-process-output proc 2)))
-    (setq completions (butlast (split-string kept "\r?\n") 2))
-    (setq completions (inf-ruby-fix-completions-on-windows completions))
-    (set-process-filter proc comint-filt)
+    (unwind-protect
+        (progn
+          (process-send-string
+           proc
+           (format (concat "if defined?(Pry.config) then "
+                           "completor = Pry.config.completer"
+                           ".build_completion_proc(binding, defined?(_pry_) ? _pry_ : Pry.new)"
+                           " elsif defined?(Bond.agent) && Bond.started? then "
+                           "completor = Bond.agent"
+                           " elsif defined?(IRB::InputCompletor::CompletionProc) then "
+                           "completor = IRB::InputCompletor::CompletionProc "
+                           "end and "
+                           "puts completor.call('%s', '%s').compact\n")
+                   (ruby-escape-single-quoted expr)
+                   (ruby-escape-single-quoted line)))
+          (while (and (not (string-match inf-ruby-prompt-pattern kept))
+                      (accept-process-output proc 2)))
+          (setq completions (butlast (split-string kept "\r?\n") 2))
+          (setq completions (inf-ruby-fix-completions-on-windows completions)))
+      (set-process-filter proc comint-filt))
     completions))
 
 (defconst inf-ruby-ruby-expr-break-chars " \t\n\"\'`><,;|&{(")
