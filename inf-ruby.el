@@ -401,15 +401,6 @@ Then switch to the process buffer."
     (replace-regexp-in-string "\n" "\\\\n"
       (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
 
-(defsubst inf-ruby-fix-completions-on-windows (completions)
-  "Maybe remove the first item from COMPLETIONS.
-On Windows, the string received by `accept-process-output' starts
-with the last line that was sent to the Ruby process because the
-subprocess echoes input."
-  (if (eq system-type 'windows-nt)
-      (cdr completions)
-    completions))
-
 (defun inf-ruby-completions (expr)
   "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
@@ -421,10 +412,8 @@ subprocess echoes input."
          inf-ruby-at-top-level-prompt-p)
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
     (unwind-protect
-        (progn
-          (process-send-string
-           proc
-           (format (concat "if defined?(Pry.config) then "
+        (let ((completion-snippet
+               (format (concat "if defined?(Pry.config) then "
                            "completor = Pry.config.completer"
                            ".build_completion_proc(binding, defined?(_pry_) ? _pry_ : Pry.new)"
                            " elsif defined?(Bond.agent) && Bond.started? then "
@@ -434,11 +423,14 @@ subprocess echoes input."
                            "end and "
                            "puts completor.call('%s', '%s').compact\n")
                    (ruby-escape-single-quoted expr)
-                   (ruby-escape-single-quoted line)))
+                   (ruby-escape-single-quoted line))))
+          (process-send-string proc completion-snippet)
           (while (and (not (string-match inf-ruby-prompt-pattern kept))
                       (accept-process-output proc 2)))
           (setq completions (butlast (split-string kept "\r?\n") 2))
-          (setq completions (inf-ruby-fix-completions-on-windows completions)))
+          ;; Subprocess echoes output on Windows and OS X.
+          (when (and completions (string= (concat (car completions) "\n") completion-snippet))
+            (setq completions (cdr completions))))
       (set-process-filter proc comint-filt))
     completions))
 
