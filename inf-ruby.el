@@ -59,6 +59,15 @@
 (require 'ruby-mode)
 (require 'thingatpt)
 
+(defgroup inf-ruby nil
+  "Run Ruby process in a buffer"
+  :group 'languages)
+
+(defcustom inf-ruby-prompt-read-only t
+  "If non-nil, the prompt will be read-only.
+
+Also see the description of `ielm-prompt-read-only'.")
+
 (defvar inf-ruby-default-implementation "ruby"
   "Which Ruby implementation to use if none is specified.")
 
@@ -207,9 +216,10 @@ The following commands are available:
   (setq mode-name "Inf-Ruby")
   (use-local-map inf-ruby-mode-map)
   (add-hook 'comint-output-filter-functions 'inf-ruby-output-filter nil t)
-  (setq comint-get-old-input (function inf-ruby-get-old-input))
-  (make-local-variable 'compilation-error-regexp-alist)
-  (setq compilation-error-regexp-alist inf-ruby-error-regexp-alist)
+  (setq comint-get-old-input 'inf-ruby-get-old-input)
+  (set (make-local-variable 'compilation-error-regexp-alist)
+       inf-ruby-error-regexp-alist)
+  (set (make-local-variable 'comint-prompt-read-only) inf-ruby-prompt-read-only)
   (when (eq system-type 'windows-nt)
     (setq comint-process-echoes t))
   (compilation-shell-minor-mode t)
