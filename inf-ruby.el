@@ -282,7 +282,7 @@ If there is a process already running in `*ruby*', switch to that buffer.
       (let ((commandlist (split-string-and-unquote command))
             (process-environment process-environment))
         ;; http://debbugs.gnu.org/15775
-        (setenv "PAGER" (executable-find "cat"))
+        (setenv "PAGER" "cat")
         (set-buffer (apply 'make-comint name (car commandlist)
                            nil (cdr commandlist)))
         (inf-ruby-mode)))
