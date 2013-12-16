@@ -269,9 +269,13 @@ run)."
 
 ;;;###autoload
 (defun run-ruby (&optional command name)
-  "Run an inferior Ruby process, input and output via buffer *ruby*.
-If there is a process already running in `*ruby*', switch to that buffer.
-\(Type \\[describe-mode] in the process buffer for a list of commands.)"
+  "Run an inferior Ruby process, input and output via buffer `*NAME*'.
+If there is a process already running in `*NAME*', switch to that buffer.
+
+NAME defaults to \"ruby\". COMMAND defaults to the default entry
+in `inf-ruby-implementations'.
+
+\(Type \\[describe-mode] in the process buffer for the list of commands.)"
 
   (interactive)
   (setq command (or command (cdr (assoc inf-ruby-default-implementation
