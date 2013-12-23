@@ -424,15 +424,16 @@ Then switch to the process buffer."
     (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
     (unwind-protect
         (let ((completion-snippet
-               (format (concat "if defined?(Pry.config) then "
+               (format (concat "proc { |expr, line| "
+                           "if defined?(Pry.config) then "
                            "completor = Pry.config.completer"
                            ".build_completion_proc(binding, defined?(_pry_) ? _pry_ : Pry.new)"
                            " elsif defined?(Bond.agent) && Bond.started? then "
                            "completor = Bond.agent"
-                           " elsif defined?(IRB::InputCompletor::CompletionProc) then "
-                           "completor = IRB::InputCompletor::CompletionProc "
-                           "end and "
-                           "puts completor.call('%s', '%s').compact\n")
+                           " end ? (puts completor.call(expr, line).compact) : "
+                           "if defined?(IRB::InputCompletor::CompletionProc) then "
+                           "puts IRB::InputCompletor::CompletionProc.call(expr).compact "
+                           "end }.call('%s', '%s')\n")
                    (ruby-escape-single-quoted expr)
                    (ruby-escape-single-quoted line))))
           (process-send-string proc completion-snippet)
