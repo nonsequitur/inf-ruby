@@ -88,7 +88,7 @@ Ruby source.
 * `ruby-switch-to-inf` switches the current buffer to the ruby process buffer.
 * `ruby-send-definition` sends the current definition to the ruby process.
 * `ruby-send-region` sends the current region to the ruby process.
-* `ruby-send-definition-and-go' and `ruby-send-region-and-go` switch to the ruby process buffer after sending their text.
+* `ruby-send-definition-and-go` and `ruby-send-region-and-go` switch to the ruby process buffer after sending their text.
 
 Commands:
 
