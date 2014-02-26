@@ -103,6 +103,7 @@ graphical char in all other prompts.")
     (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
     (define-key map (kbd "TAB") 'inf-ruby-complete)
     (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
+    (define-key map (kbd "C-c C-z") 'ruby-switch-to-last-ruby-buffer)
     map)
   "Mode map for `inf-ruby-mode'.")
 
@@ -284,12 +285,14 @@ in `inf-ruby-implementations'.
 
   (if (not (comint-check-proc inf-ruby-buffer))
       (let ((commandlist (split-string-and-unquote command))
+            (buffer (current-buffer))
             (process-environment process-environment))
         ;; http://debbugs.gnu.org/15775
         (setenv "PAGER" (executable-find "cat"))
         (set-buffer (apply 'make-comint name (car commandlist)
                            nil (cdr commandlist)))
-        (inf-ruby-mode)))
+        (inf-ruby-mode)
+        (ruby-remember-ruby-buffer buffer)))
   (pop-to-buffer (setq inf-ruby-buffer (format "*%s*" name))))
 
 (defun inf-ruby-proc ()
@@ -363,16 +366,33 @@ Must not contain ruby meta characters.")
       (ruby-beginning-of-block)
       (ruby-send-region (point) end))))
 
+(defvar ruby-last-ruby-buffer nil
+  "The last buffer we switched to `inf-ruby' from.")
+
+(defun ruby-remember-ruby-buffer (buffer)
+  (setq ruby-last-ruby-buffer buffer))
+
 (defun ruby-switch-to-inf (eob-p)
   "Switch to the ruby process buffer.
 With argument, positions cursor at end of buffer."
   (interactive "P")
-  (if (and inf-ruby-buffer (get-buffer inf-ruby-buffer))
-      (pop-to-buffer inf-ruby-buffer)
-    (error "No current process buffer, see variable inf-ruby-buffer"))
+  (let ((buffer (current-buffer)))
+    (if (and inf-ruby-buffer (get-buffer inf-ruby-buffer))
+        (progn
+          (pop-to-buffer inf-ruby-buffer)
+          (ruby-remember-ruby-buffer buffer))
+      (error "No current process buffer, see variable inf-ruby-buffer")))
   (cond (eob-p
          (push-mark)
          (goto-char (point-max)))))
+
+(defun ruby-switch-to-last-ruby-buffer ()
+  "Switch back to the last Ruby buffer."
+  (interactive)
+  (if (and ruby-last-ruby-buffer
+           (buffer-live-p ruby-last-ruby-buffer))
+      (pop-to-buffer ruby-last-ruby-buffer)
+    (message "Don't know the original Ruby buffer")))
 
 (defun ruby-send-region-and-go (start end)
   "Send the current region to the inferior Ruby process.
@@ -501,7 +521,7 @@ completion."
   "Original compilation mode before switching to `inf-ruby-mode'.")
 
 (defvar inf-ruby-orig-process-filter nil
-  "Original process filter before switching to `inf-ruby-mode`.")
+  "Original process filter before switching to `inf-ruby-mode'.")
 
 (defun inf-ruby-switch-from-compilation ()
   "Make the buffer writable and switch to `inf-ruby-mode'.
