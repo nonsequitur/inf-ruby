@@ -441,29 +441,43 @@ Then switch to the process buffer."
          (kept "") completions
          ;; Guard against running completions in parallel:
          inf-ruby-at-top-level-prompt-p)
-    (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
-    (unwind-protect
-        (let ((completion-snippet
-               (format (concat "proc { |expr, line| "
-                           "if defined?(Pry.config) then "
-                           "completor = Pry.config.completer"
-                           ".build_completion_proc(binding, defined?(_pry_) ? _pry_ : Pry.new)"
-                           " elsif defined?(Bond.agent) && Bond.started? then "
-                           "completor = Bond.agent"
-                           " end ? (puts completor.call(expr, line).compact) : "
-                           "if defined?(IRB::InputCompletor::CompletionProc) then "
-                           "puts IRB::InputCompletor::CompletionProc.call(expr).compact "
-                           "end }.call('%s', '%s')\n")
-                   (ruby-escape-single-quoted expr)
-                   (ruby-escape-single-quoted line))))
-          (process-send-string proc completion-snippet)
-          (while (and (not (string-match inf-ruby-prompt-pattern kept))
-                      (accept-process-output proc 2)))
-          (setq completions (butlast (split-string kept "\r?\n") 2))
-          ;; Subprocess echoes output on Windows and OS X.
-          (when (and completions (string= (concat (car completions) "\n") completion-snippet))
-            (setq completions (cdr completions))))
-      (set-process-filter proc comint-filt))
+    (unless (equal "(rdb:1) " (buffer-substring (car comint-last-prompt)
+                                                (cdr comint-last-prompt)))
+      (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
+      (unwind-protect
+          (let ((completion-snippet
+                 (format
+                  (concat
+                   "proc { |expr, line, old_wp|"
+                   "  require 'ostruct';"
+                   "  begin"
+                   "    Bond.agent.instance_variable_set('@weapon',"
+                   "      OpenStruct.new(line_buffer: line)) if old_wp;"
+                   "    if defined?(_pry_.complete) then"
+                   "      puts _pry_.complete(expr)"
+                   "    else"
+                   "      completer = if defined?(_pry_) then"
+                   "        Pry.config.completer.build_completion_proc(binding, _pry_)"
+                   "      elsif old_wp then"
+                   "        Bond.agent"
+                   "      elsif defined?(IRB::InputCompletor::CompletionProc) then"
+                   "        IRB::InputCompletor::CompletionProc"
+                   "      end and puts completer.call(expr).compact"
+                   "    end"
+                   "  ensure"
+                   "    Bond.agent.instance_variable_set('@weapon', old_wp) if old_wp "
+                   "  end "
+                   "}.call('%s', '%s', defined?(Bond) && Bond.started? && Bond.agent.weapon)\n")
+                  (ruby-escape-single-quoted expr)
+                  (ruby-escape-single-quoted line))))
+            (process-send-string proc completion-snippet)
+            (while (and (not (string-match inf-ruby-prompt-pattern kept))
+                        (accept-process-output proc 2)))
+            (setq completions (butlast (split-string kept "\r?\n") 2))
+            ;; Subprocess echoes output on Windows and OS X.
+            (when (and completions (string= (concat (car completions) "\n") completion-snippet))
+              (setq completions (cdr completions))))
+        (set-process-filter proc comint-filt)))
     completions))
 
 (defconst inf-ruby-ruby-expr-break-chars " \t\n\"\'`><,;|&{(")
