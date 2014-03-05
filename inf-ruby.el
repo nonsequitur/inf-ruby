@@ -448,8 +448,9 @@ Then switch to the process buffer."
           (let ((completion-snippet
                  (format
                   (concat
-                   "proc { |expr, line, old_wp|"
+                   "proc { |expr, line|"
                    "  require 'ostruct';"
+                   "  old_wp = defined?(Bond) && Bond.started? && Bond.agent.weapon;"
                    "  begin"
                    "    Bond.agent.instance_variable_set('@weapon',"
                    "      OpenStruct.new(line_buffer: line)) if old_wp;"
@@ -467,7 +468,7 @@ Then switch to the process buffer."
                    "  ensure"
                    "    Bond.agent.instance_variable_set('@weapon', old_wp) if old_wp "
                    "  end "
-                   "}.call('%s', '%s', defined?(Bond) && Bond.started? && Bond.agent.weapon)\n")
+                   "}.call('%s', '%s')\n")
                   (ruby-escape-single-quoted expr)
                   (ruby-escape-single-quoted line))))
             (process-send-string proc completion-snippet)
