@@ -130,6 +130,10 @@ Used for determining the default in the
 next one.")
 
 (defvar inf-ruby-at-top-level-prompt-p t)
+(make-variable-buffer-local 'inf-ruby-at-top-level-prompt-p)
+
+(defvar inf-ruby-last-prompt nil)
+(make-variable-buffer-local 'inf-ruby-last-prompt)
 
 (defconst inf-ruby-error-regexp-alist
   '(("SyntaxError: \\(?:compile error\n\\)?\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
@@ -229,9 +233,10 @@ The following commands are available:
 (defun inf-ruby-output-filter (output)
   "Check if the current prompt is a top-level prompt."
   (unless (zerop (length output))
-    (setq inf-ruby-at-top-level-prompt-p
+    (setq inf-ruby-last-prompt (car (last (split-string output "\n")))
+          inf-ruby-at-top-level-prompt-p
           (string-match inf-ruby-first-prompt-pattern
-                        (car (last (split-string output "\n")))))))
+                        inf-ruby-last-prompt))))
 
 ;; adapted from replace-in-string in XEmacs (subr.el)
 (defun inf-ruby-remove-in-string (str regexp)
@@ -441,8 +446,7 @@ Then switch to the process buffer."
          (kept "") completions
          ;; Guard against running completions in parallel:
          inf-ruby-at-top-level-prompt-p)
-    (unless (equal "(rdb:1) " (buffer-substring (car comint-last-prompt)
-                                                (cdr comint-last-prompt)))
+    (unless (equal "(rdb:1) " inf-ruby-last-prompt)
       (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
       (unwind-protect
           (let ((completion-snippet
