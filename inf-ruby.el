@@ -440,7 +440,8 @@ Then switch to the process buffer."
 (defun inf-ruby-completions (expr)
   "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
-         (line (buffer-substring (save-excursion (beginning-of-thing 'line))
+         (line (buffer-substring (save-excursion (move-beginning-of-line 1)
+                                                 (point))
                                  (point)))
          (comint-filt (process-filter proc))
          (kept "") completions
