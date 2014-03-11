@@ -44,7 +44,7 @@ If you're installing manually, you'll need to:
 * Add the following lines to your `.emacs` (or `init.el`) file:
 
 ```lisp
-(autoload 'inf-ruby "inf-ruby" "Run an inferior Ruby process" t)
+(autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
 (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
 ```
 
