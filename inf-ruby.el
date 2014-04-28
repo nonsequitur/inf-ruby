@@ -77,6 +77,7 @@ Also see the description of `ielm-prompt-read-only'.")
     #'identity
     '("\\(^%s> *\\)"                      ; Simple
       "\\(^(rdb:1) *\\)"                  ; Debugger
+      "\\(^(byebug) *\\)"                 ; byebug
       "\\(^\\(irb([^)]+)"                 ; IRB default
       "\\([[0-9]+] \\)?[Pp]ry ?([^)]+)"   ; Pry
       "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
