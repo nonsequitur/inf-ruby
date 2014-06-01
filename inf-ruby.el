@@ -625,7 +625,7 @@ automatically."
 (defun inf-ruby-console-rails (dir)
   "Run Rails console in DIR."
   (interactive "D")
-  (let ((default-directory dir))
+  (let ((default-directory (file-name-as-directory dir)))
     (run-ruby "rails console" "rails")))
 
 ;;;###autoload
@@ -634,7 +634,7 @@ automatically."
 The main module should be loaded automatically.  If DIR contains a
 Gemfile, it should use the `gemspec' instruction."
   (interactive "D")
-  (let* ((default-directory dir)
+  (let* ((default-directory (file-name-as-directory dir))
          (base-command (if (file-exists-p "Gemfile")
                            "bundle exec irb"
                          "irb -I lib"))
@@ -658,7 +658,7 @@ Gemfile, it should use the `gemspec' instruction."
 (defun inf-ruby-console-default (dir)
   "Run racksh, custom console.rb, or just IRB, in DIR."
   (interactive "D")
-  (let ((default-directory dir))
+  (let ((default-directory (file-name-as-directory dir)))
     (unless (file-exists-p "Gemfile")
       (error "The directory must contain a Gemfile"))
     (cond
