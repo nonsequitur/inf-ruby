@@ -109,8 +109,8 @@ graphical char in all other prompts.")
   "Mode map for `inf-ruby-mode'.")
 
 (defvar inf-ruby-implementations
-  '(("ruby"     . "irb --prompt default -r irb/completion")
-    ("jruby"    . "jruby -S irb --prompt default -r irb/completion")
+  '(("ruby"     . "irb --prompt default --noreadline -r irb/completion")
+    ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("yarv"     . "irb1.9 -r irb/completion")
     ("macruby"  . "macirb -r irb/completion")
