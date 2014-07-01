@@ -66,10 +66,14 @@
 (defcustom inf-ruby-prompt-read-only t
   "If non-nil, the prompt will be read-only.
 
-Also see the description of `ielm-prompt-read-only'.")
+Also see the description of `ielm-prompt-read-only'."
+  :type 'boolean
+  :group 'inf-ruby)
 
-(defvar inf-ruby-default-implementation "ruby"
-  "Which Ruby implementation to use if none is specified.")
+(defcustom inf-ruby-default-implementation "ruby"
+  "Which Ruby implementation to use if none is specified."
+  :type 'string
+  :group 'inf-ruby)
 
 (defconst inf-ruby-prompt-format
   (concat
