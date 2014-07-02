@@ -72,7 +72,8 @@ Also see the description of `ielm-prompt-read-only'."
 
 (defcustom inf-ruby-default-implementation "ruby"
   "Which Ruby implementation to use if none is specified."
-  :type 'string
+  :type `(choice ,@(mapcar (lambda (item) (list 'const (car item)))
+                           inf-ruby-implementations))
   :group 'inf-ruby)
 
 (defconst inf-ruby-prompt-format
@@ -112,6 +113,7 @@ graphical char in all other prompts.")
     map)
   "Mode map for `inf-ruby-mode'.")
 
+;;;###autoload
 (defvar inf-ruby-implementations
   '(("ruby"     . "irb --prompt default --noreadline -r irb/completion")
     ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
