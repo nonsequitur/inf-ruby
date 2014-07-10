@@ -625,8 +625,17 @@ automatically."
 (defun inf-ruby-console-rails (dir)
   "Run Rails console in DIR."
   (interactive "D")
-  (let ((default-directory (file-name-as-directory dir)))
-    (run-ruby "rails console" "rails")))
+  (let* ((default-directory (file-name-as-directory dir))
+         (envs (inf-ruby-console-rails-envs))
+         (env (completing-read "Rails environment: " envs nil t
+                               nil nil (car (member "development" envs)))))
+    (run-ruby (format "rails console %s" env) "rails")))
+
+(defun inf-ruby-console-rails-envs ()
+  (let ((files (file-expand-wildcards "config/environments/*.rb")))
+    (if (null files)
+        (error "No files in %s" (expand-file-name "config/environments/"))
+      (mapcar #'file-name-base files))))
 
 ;;;###autoload
 (defun inf-ruby-console-gem (dir)
