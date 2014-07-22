@@ -651,7 +651,7 @@ Gemfile, it should use the `gemspec' instruction."
     (unless (file-exists-p "lib")
       (error "The directory must contain a 'lib' subdirectory"))
     (dolist (item (directory-files "lib"))
-      (unless (file-directory-p item)
+      (unless (file-directory-p (format "lib/%s" item))
         (setq files (cons item files))))
     (run-ruby (concat base-command " "
                       ;; If there are several files under 'lib'
