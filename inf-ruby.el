@@ -644,9 +644,13 @@ The main module should be loaded automatically.  If DIR contains a
 Gemfile, it should use the `gemspec' instruction."
   (interactive "D")
   (let* ((default-directory (file-name-as-directory dir))
-         (base-command (if (file-exists-p "Gemfile")
-                           "bundle exec irb"
-                         "irb -I lib"))
+         (gemspec (car (file-expand-wildcards "*.gemspec")))
+         (base-command
+          (if (file-exists-p "Gemfile")
+              (if (inf-ruby-file-contents-match gemspec "\\$LOAD_PATH")
+                  "bundle exec irb"
+                "bundle exec irb -I lib")
+            "irb -I lib"))
          files)
     (unless (file-exists-p "lib")
       (error "The directory must contain a 'lib' subdirectory"))
@@ -671,14 +675,18 @@ Gemfile, it should use the `gemspec' instruction."
     (unless (file-exists-p "Gemfile")
       (error "The directory must contain a Gemfile"))
     (cond
-     ((with-temp-buffer
-        (insert-file-contents "Gemfile")
-        (re-search-forward "[\"']racksh[\"']" nil t))
+     ((inf-ruby-file-contents-match "Gemfile" "[\"']racksh[\"']")
       (run-ruby "bundle exec racksh" "racksh"))
      ((file-exists-p "console.rb")
       (run-ruby "ruby console.rb" "console.rb"))
      (t
       (run-ruby "bundle console")))))
+
+;;;###autoload
+(defun inf-ruby-file-contents-match (file regexp)
+  (with-temp-buffer
+    (insert-file-contents file)
+    (re-search-forward regexp nil t)))
 
 ;;;###autoload (dolist (mode ruby-source-modes) (add-hook (intern (format "%s-hook" mode)) 'inf-ruby-minor-mode))
 
