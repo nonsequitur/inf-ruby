@@ -651,21 +651,27 @@ Gemfile, it should use the `gemspec' instruction."
                   "bundle exec irb"
                 "bundle exec irb -I lib")
             "irb -I lib"))
-         files)
+         (name (inf-ruby-file-contents-match
+                gemspec "\\.name[ \t]*=[ \t]*\"\\([^\"]+\\)\"" 1))
+         args files)
     (unless (file-exists-p "lib")
       (error "The directory must contain a 'lib' subdirectory"))
-    (dolist (item (directory-files "lib"))
-      (unless (file-directory-p (format "lib/%s" item))
-        (setq files (cons item files))))
-    (run-ruby (concat base-command " "
-                      ;; If there are several files under 'lib'
-                      ;; (unlikely), load them all.
-                      (mapconcat
-                       (lambda (file)
-                         (concat " -r " (file-name-sans-extension file)))
-                       files
-                       ""))
-              "gem")))
+    (let ((feature (and name (replace-regexp-in-string "-" "/" name))))
+      (if (and feature (file-exists-p (concat "lib/" feature ".rb")))
+          ;; There exists the main file corresponding to the gem name,
+          ;; let's require it.
+          (setq args (concat " -r " feature))
+        ;; Let's require all non-directory files under lib, instead.
+        (dolist (item (directory-files "lib"))
+          (unless (file-directory-p (format "lib/%s" item))
+            (push item files)))
+        (setq args
+              (mapconcat
+               (lambda (file)
+                 (concat " -r " (file-name-sans-extension file)))
+               files
+               ""))))
+    (run-ruby (concat base-command args) "gem")))
 
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
@@ -683,10 +689,13 @@ Gemfile, it should use the `gemspec' instruction."
       (run-ruby "bundle console")))))
 
 ;;;###autoload
-(defun inf-ruby-file-contents-match (file regexp)
+(defun inf-ruby-file-contents-match (file regexp &optional match-group)
   (with-temp-buffer
     (insert-file-contents file)
-    (re-search-forward regexp nil t)))
+    (when (re-search-forward regexp nil t)
+      (if match-group
+          (match-string match-group)
+        t))))
 
 ;;;###autoload (dolist (mode ruby-source-modes) (add-hook (intern (format "%s-hook" mode)) 'inf-ruby-minor-mode))
 
