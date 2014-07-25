@@ -112,6 +112,7 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 
 * The REPL buffer doesn't seem to react to input?
 
-  Try putting `IRB.conf[:USE_READLINE] = false` into your `~/.irbrc` (issue #51).
+  Try putting `IRB.conf[:USE_READLINE] = false` into your `~/.irbrc`
+  (issue [#51](https://github.com/nonsequitur/inf-ruby/issues/51)).
 
 Please report problems at <http://github.com/nonsequitur/inf-ruby/issues>.
