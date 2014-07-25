@@ -628,8 +628,12 @@ automatically."
   (let* ((default-directory (file-name-as-directory dir))
          (envs (inf-ruby-console-rails-envs))
          (env (completing-read "Rails environment: " envs nil t
-                               nil nil (car (member "development" envs)))))
-    (run-ruby (format "rails console %s" env) "rails")))
+                               nil nil (car (member "development" envs))))
+         (with-bundler (file-exists-p "Gemfile")))
+    (run-ruby (concat (when with-bundler "bundle exec ")
+                      "rails console "
+                      env)
+              "rails")))
 
 (defun inf-ruby-console-rails-envs ()
   (let ((files (file-expand-wildcards "config/environments/*.rb")))
