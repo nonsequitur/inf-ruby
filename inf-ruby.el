@@ -59,6 +59,10 @@
 (require 'ruby-mode)
 (require 'thingatpt)
 
+(eval-when-compile
+  (defvar rspec-compilation-mode-map)
+  (defvar ruby-compilation-mode-map))
+
 (defgroup inf-ruby nil
   "Run Ruby process in a buffer"
   :group 'languages)
