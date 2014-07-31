@@ -229,9 +229,6 @@ The following commands are available:
   (when (eq system-type 'windows-nt)
     (setq comint-process-echoes t))
   (compilation-shell-minor-mode t)
-  ;; Workaround for pry 0.10.0
-  ;; https://github.com/pry/pry/issues/1267
-  (set-process-window-size (get-buffer-process (current-buffer)) 1 1)
   (run-hooks 'inf-ruby-mode-hook))
 
 (defun inf-ruby-output-filter (output)
