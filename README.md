@@ -115,4 +115,8 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
   Try putting `IRB.conf[:USE_READLINE] = false` into your `~/.irbrc`
   (issue [#51](https://github.com/nonsequitur/inf-ruby/issues/51)).
 
+* Pry raises ZeroDivisionError in `lib/pry/pager.rb`?
+
+  Put `Pry.config.pager = false if ENV["EMACS"]` into your `~/.pryrc`.
+
 Please report problems at <http://github.com/nonsequitur/inf-ruby/issues>.
