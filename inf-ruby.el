@@ -694,7 +694,7 @@ Gemfile, it should use the `gemspec' instruction."
      ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
       (run-ruby "bundle exec pry" "pry"))
      ((file-exists-p "console.rb")
-      (run-ruby "ruby console.rb" "console.rb"))
+      (run-ruby "bundle exec ruby console.rb" "console.rb"))
      (t
       (run-ruby "bundle console")))))
 
