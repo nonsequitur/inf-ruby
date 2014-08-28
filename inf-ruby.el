@@ -70,6 +70,17 @@ Also see the description of `ielm-prompt-read-only'."
   :type 'boolean
   :group 'inf-ruby)
 
+(defcustom inf-ruby-implementations
+  '(("ruby"     . "irb --prompt default --noreadline -r irb/completion")
+    ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
+    ("rubinius" . "rbx -r irb/completion")
+    ("yarv"     . "irb1.9 -r irb/completion")
+    ("macruby"  . "macirb -r irb/completion")
+    ("pry"      . "pry"))
+  "An alist of ruby implementations to irb executable names."
+  :type '(repeat (cons string string))
+  :group 'inf-ruby)
+
 (defcustom inf-ruby-default-implementation "ruby"
   "Which Ruby implementation to use if none is specified."
   :type `(choice ,@(mapcar (lambda (item) (list 'const (car item)))
@@ -112,16 +123,6 @@ graphical char in all other prompts.")
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-last-ruby-buffer)
     map)
   "Mode map for `inf-ruby-mode'.")
-
-;;;###autoload
-(defvar inf-ruby-implementations
-  '(("ruby"     . "irb --prompt default --noreadline -r irb/completion")
-    ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
-    ("rubinius" . "rbx -r irb/completion")
-    ("yarv"     . "irb1.9 -r irb/completion")
-    ("macruby"  . "macirb -r irb/completion")
-    ("pry"      . "pry"))
-  "An alist of ruby implementations to irb executable names.")
 
 ;;;###autoload
 (defvar ruby-source-modes '(ruby-mode enh-ruby-mode)
