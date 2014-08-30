@@ -119,4 +119,8 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 
   Put `Pry.config.pager = false if ENV["EMACS"]` into your `~/.pryrc`.
 
+* Pry prints `[0G` right after start?
+
+  Put `Pry.config.correct_indent = false if ENV["EMACS"]` into your `~/.pryrc`.
+
 Please report problems at <http://github.com/nonsequitur/inf-ruby/issues>.
