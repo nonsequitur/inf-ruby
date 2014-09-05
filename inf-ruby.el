@@ -10,7 +10,7 @@
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.3.3
+;; Version: 2.4.0
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ graphical char in all other prompts.")
   (let ((map (copy-keymap comint-mode-map)))
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
-    (define-key map (kbd "TAB") 'inf-ruby-complete)
+    (define-key map (kbd "TAB") 'completion-at-point)
     (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-last-ruby-buffer)
     map)
@@ -246,6 +246,7 @@ The following commands are available:
   (set (make-local-variable 'comint-prompt-read-only) inf-ruby-prompt-read-only)
   (when (eq system-type 'windows-nt)
     (setq comint-process-echoes t))
+  (add-hook 'completion-at-point-functions 'inf-ruby-completion-at-point nil t)
   (compilation-shell-minor-mode t)
   (run-hooks 'inf-ruby-mode-hook))
 
@@ -509,52 +510,28 @@ Then switch to the process buffer."
 
 (defun inf-ruby-completion-bounds-of-expr-at-point ()
   "Return bounds of expression at point to complete."
-  (save-excursion
-    (let ((end (point)))
-      (skip-chars-backward (concat "^" inf-ruby-ruby-expr-break-chars))
-      (cons (point) end))))
+  (when (not (memq (char-syntax (following-char)) '(?w ?_)))
+    (save-excursion
+      (let ((end (point)))
+        (skip-chars-backward (concat "^" inf-ruby-ruby-expr-break-chars))
+        (cons (point) end)))))
 
 (defun inf-ruby-completion-expr-at-point ()
   "Return expression at point to complete."
   (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
-    (buffer-substring (car bounds) (cdr bounds))))
+    (and bounds
+         (buffer-substring (car bounds) (cdr bounds)))))
 
 (defun inf-ruby-completion-at-point ()
   "Retrieve the list of completions and prompt the user.
 Returns the selected completion or nil."
-  (if inf-ruby-at-top-level-prompt-p
-      (let* ((expr (inf-ruby-completion-expr-at-point))
-             (completions (inf-ruby-completions expr)))
-        (if completions
-            (if (= (length completions) 1)
-                (car completions)
-              (completing-read "possible completions: "
-                               completions nil t expr))))
-    (message "Completion aborted: Not at a top-level prompt")
-    nil))
-
-(defun inf-ruby-complete ()
-  "Complete the Ruby code at point.
-Uses the first one available of Pry, Bond and the default IRB
-completion."
-  (interactive)
-  (let ((replacement (inf-ruby-completion-at-point)))
-    (when replacement
-      (inf-ruby-complete-replace-expr replacement))))
-
-(defun inf-ruby-complete-replace-expr (str)
-  "Replace expression at point with STR."
   (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
-    (delete-region (car bounds) (cdr bounds)))
-  (insert str))
-
-(defun inf-ruby-complete-or-tab ()
-  "Complete the Ruby code at point or call `indent-for-tab-command'."
-  (interactive)
-  (let ((replacement (inf-ruby-completion-at-point)))
-    (if (not replacement)
-        (call-interactively 'indent-for-tab-command)
-      (inf-ruby-complete-replace-expr replacement))))
+    (when bounds
+      (list (car bounds) (cdr bounds)
+            (when inf-ruby-at-top-level-prompt-p
+              (if (fboundp 'completion-table-with-cache)
+                  (completion-table-with-cache #'inf-ruby-completions)
+                (completion-table-dynamic #'inf-ruby-completions)))))))
 
 (defvar inf-ruby-orig-compilation-mode nil
   "Original compilation mode before switching to `inf-ruby-mode'.")
