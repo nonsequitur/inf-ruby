@@ -680,12 +680,12 @@ Gemfile, it should use the `gemspec' instruction."
     (unless (file-exists-p "Gemfile")
       (error "The directory must contain a Gemfile"))
     (cond
+     ((file-exists-p "console.rb")
+      (run-ruby "bundle exec ruby console.rb" "console.rb"))
      ((inf-ruby-file-contents-match "Gemfile" "[\"']racksh[\"']")
       (run-ruby "bundle exec racksh" "racksh"))
      ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
       (run-ruby "bundle exec pry" "pry"))
-     ((file-exists-p "console.rb")
-      (run-ruby "bundle exec ruby console.rb" "console.rb"))
      (t
       (run-ruby "bundle console")))))
 
