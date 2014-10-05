@@ -336,7 +336,7 @@ See variable `inf-ruby-buffer'."
 Must not contain ruby meta characters.")
 
 (defconst inf-ruby-eval-binding
-  (concat "(IRB.conf[:MAIN_CONTEXT] && IRB.conf[:MAIN_CONTEXT].workspace.binding) || "
+  (concat "(defined?(IRB) && IRB.conf[:MAIN_CONTEXT] && IRB.conf[:MAIN_CONTEXT].workspace.binding) || "
           "(defined?(Pry) && Pry.toplevel_binding)"))
 
 (defconst ruby-eval-separator "")
