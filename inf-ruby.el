@@ -587,7 +587,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
        'inf-ruby-switch-from-compilation)))
 
 (defvar inf-ruby-console-patterns-alist
-  '(("config/application.rb" . rails)
+  '(("bin/rails" . rails)
     ("*.gemspec" . gem)
     ("Gemfile" . default))
   "Mapping from file name patterns to name symbols.
