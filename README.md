@@ -84,14 +84,14 @@ It recognizes several project types, including Rails, gems and anything with `ra
 Customization: When entered, this mode runs `comint-mode-hook` and
 `inf-ruby-mode-hook` (in that order).
 
-### Functions
+### Commands
 
 * `ruby-switch-to-inf` switches the current buffer to the ruby process buffer.
 * `ruby-send-definition` sends the current definition to the ruby process.
 * `ruby-send-region` sends the current region to the ruby process.
 * `ruby-send-definition-and-go` and `ruby-send-region-and-go` switch to the ruby process buffer after sending their text.
 
-### Commands
+### Keybindings
 
 * <kbd>RET</kbd> after the end of the process' output sends the text from the
 end of process to point.
