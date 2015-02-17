@@ -74,23 +74,24 @@ Prelude user you can start using it right away.
 
 ## Usage
 
+### IRB
 A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
 
+### Project
 To launch a REPL with project-specific console instead, type <kbd>M-x inf-ruby-console-auto</kbd>.
 It recognizes several project types, including Rails, gems and anything with `racksh` in their Gemfile.
 
 Customization: When entered, this mode runs `comint-mode-hook` and
 `inf-ruby-mode-hook` (in that order).
 
-You can send text to the inferior Ruby process from other buffers containing
-Ruby source.
+### Commands
 
 * `ruby-switch-to-inf` switches the current buffer to the ruby process buffer.
 * `ruby-send-definition` sends the current definition to the ruby process.
 * `ruby-send-region` sends the current region to the ruby process.
 * `ruby-send-definition-and-go` and `ruby-send-region-and-go` switch to the ruby process buffer after sending their text.
 
-Commands:
+### Keybindings
 
 * <kbd>RET</kbd> after the end of the process' output sends the text from the
 end of process to point.
