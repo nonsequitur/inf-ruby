@@ -587,20 +587,24 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
        'inf-ruby-switch-from-compilation)))
 
 (defvar inf-ruby-console-patterns-alist
-  '(("bin/rails" . rails)
+  '((inf-ruby-console-rails-p . rails)
     ("*.gemspec" . gem)
+    (inf-ruby-console-racksh-p . racksh)
     ("Gemfile" . default))
-  "Mapping from file name patterns to name symbols.
+  "Mapping from predicates (wildcard patterns or functions) to name symbols.
 `inf-ruby-console-auto' walks up from the current directory until
-one of the patterns matches, then calls `inf-ruby-console-NAME',
+one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
 (defun inf-ruby-console-match (dir)
   "Find matching console command for DIR, if any."
   (catch 'type
     (dolist (pair inf-ruby-console-patterns-alist)
-      (let ((default-directory dir))
-        (when (file-expand-wildcards (car pair))
+      (let ((default-directory dir)
+            (pred (car pair)))
+        (when (if (stringp pred)
+                  (file-expand-wildcards pred)
+                (funcall pred))
           (throw 'type (cdr pair)))))))
 
 ;;;###autoload
@@ -615,6 +619,10 @@ automatically."
          (fun (intern (format "inf-ruby-console-%s" type))))
     (unless type (error "No matching directory found"))
     (funcall fun dir)))
+
+(defun inf-ruby-console-rails-p ()
+  (and (file-exists-p "Gemfile.lock")
+       (inf-ruby-file-contents-match "Gemfile.lock" "^ +railties ")))
 
 ;;;###autoload
 (defun inf-ruby-console-rails (dir)
@@ -672,9 +680,19 @@ Gemfile, it should use the `gemspec' instruction."
                ""))))
     (run-ruby (concat base-command args) "gem")))
 
+(defun inf-ruby-console-racksh-p ()
+  (and (file-exists-p "Gemfile.lock")
+       (inf-ruby-file-contents-match "Gemfile.lock" "^ +racksh ")))
+
+(defun inf-ruby-console-racksh (dir)
+  "Run racksh in DIR."
+  (interactive "D")
+  (let ((default-directory (file-name-as-directory dir)))
+    (run-ruby "bundle exec racksh" "racksh")))
+
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
-  "Run racksh, custom console.rb, or just IRB, in DIR."
+  "Run custom console.rb, Pry, or bundle console, in DIR."
   (interactive "D")
   (let ((default-directory (file-name-as-directory dir)))
     (unless (file-exists-p "Gemfile")
@@ -682,8 +700,6 @@ Gemfile, it should use the `gemspec' instruction."
     (cond
      ((file-exists-p "console.rb")
       (run-ruby "bundle exec ruby console.rb" "console.rb"))
-     ((inf-ruby-file-contents-match "Gemfile" "[\"']racksh[\"']")
-      (run-ruby "bundle exec racksh" "racksh"))
      ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
       (run-ruby "bundle exec pry" "pry"))
      (t
