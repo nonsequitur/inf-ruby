@@ -622,7 +622,10 @@ automatically."
 
 (defun inf-ruby-console-rails-p ()
   (and (file-exists-p "Gemfile.lock")
-       (inf-ruby-file-contents-match "Gemfile.lock" "^ +railties ")))
+       (inf-ruby-file-contents-match "Gemfile.lock" "^ +railties ")
+       (file-exists-p "config/application.rb")
+       (inf-ruby-file-contents-match "config/application.rb"
+                                     "\\_<Rails::Application\\_>")))
 
 ;;;###autoload
 (defun inf-ruby-console-rails (dir)
