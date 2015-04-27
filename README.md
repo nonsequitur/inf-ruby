@@ -118,10 +118,10 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 
 * Pry raises ZeroDivisionError in `lib/pry/pager.rb`?
 
-  Put `Pry.config.pager = false if ENV["EMACS"]` into your `~/.pryrc`.
+  Put `Pry.config.pager = false if ENV["INSIDE_EMACS"]` into your `~/.pryrc`.
 
 * Pry prints `[0G` right after start?
 
-  Put `Pry.config.correct_indent = false if ENV["EMACS"]` into your `~/.pryrc`.
+  Put `Pry.config.correct_indent = false if ENV["INSIDE_EMACS"]` into your `~/.pryrc`.
 
 Please report problems at <http://github.com/nonsequitur/inf-ruby/issues>.
