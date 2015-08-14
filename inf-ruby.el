@@ -539,9 +539,6 @@ Returns the selected completion or nil."
 (defvar inf-ruby-orig-process-filter nil
   "Original process filter before switching to `inf-ruby-mode'.")
 
-(defvar inf-ruby-orig-compilation-arguments nil
-  "Original compilation arguments before switching to `inf-ruby-mode'.")
-
 (defun inf-ruby-switch-from-compilation ()
   "Make the buffer writable and switch to `inf-ruby-mode'.
 Recommended for use when the program being executed enters
@@ -553,9 +550,8 @@ interactive mode, i.e. hits a debugger breakpoint."
         (arguments compilation-arguments))
     (inf-ruby-mode)
     (make-local-variable 'inf-ruby-orig-compilation-mode)
-    (make-local-variable 'inf-ruby-orig-compilation-arguments)
-    (setq inf-ruby-orig-compilation-mode mode
-          inf-ruby-orig-compilation-arguments arguments))
+    (setq inf-ruby-orig-compilation-mode mode)
+    (set (make-local-variable 'compilation-arguments) arguments))
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (make-local-variable 'inf-ruby-orig-process-filter)
@@ -574,11 +570,11 @@ Otherwise, just toggle read-only status."
   (if inf-ruby-orig-compilation-mode
       (let ((orig-mode-line-process mode-line-process)
             (proc (get-buffer-process (current-buffer)))
-            (arguments inf-ruby-orig-compilation-arguments)
+            (arguments compilation-arguments)
             (filter inf-ruby-orig-process-filter))
         (funcall inf-ruby-orig-compilation-mode)
-        (setq mode-line-process orig-mode-line-process
-              compilation-arguments arguments)
+        (setq mode-line-process orig-mode-line-process)
+        (set (make-local-variable 'compilation-arguments) arguments)
         (when proc
           (set-process-filter proc filter)))
     (toggle-read-only)))
