@@ -341,9 +341,9 @@ Must not contain ruby meta characters.")
 
 (defconst ruby-eval-separator "")
 
-(defun ruby-send-region (start end)
+(defun ruby-send-region (start end &optional print)
   "Send the current region to the inferior Ruby process."
-  (interactive "r")
+  (interactive "r\nP")
   (let (term (file (or buffer-file-name (buffer-name))) line)
     (save-excursion
       (save-restriction
@@ -365,7 +365,28 @@ Must not contain ruby meta characters.")
                                                 term inf-ruby-eval-binding
                                                 file line))
     (comint-send-region (inf-ruby-proc) start end)
-    (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))))
+    (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))
+    (when print (ruby-print-result))))
+
+(defun ruby-print-result ()
+  "Print the result of the last evaluation in the current buffer."
+  (let ((proc (inf-ruby-proc)))
+    (insert
+     (with-current-buffer inf-ruby-buffer
+       (while (not (and comint-last-prompt
+                        (goto-char (car comint-last-prompt))
+                        (looking-at inf-ruby-first-prompt-pattern)))
+         (accept-process-output proc))
+       (re-search-backward inf-ruby-prompt-pattern)
+       (or (re-search-forward " => " (car comint-last-prompt) t)
+           ;; Evaluation seems to have failed.
+           ;; Try to extract the error string.
+           (let* ((inhibit-field-text-motion t)
+                  (s (buffer-substring-no-properties (point) (line-end-position))))
+             (while (string-match inf-ruby-prompt-pattern s)
+               (setq s (replace-match "" t t s)))
+             (error "%s" s)))
+       (buffer-substring-no-properties (point) (line-end-position))))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
@@ -376,20 +397,22 @@ Must not contain ruby meta characters.")
       (ruby-beginning-of-defun)
       (ruby-send-region (point) end))))
 
-(defun ruby-send-last-sexp ()
+(defun ruby-send-last-sexp (&optional print)
   "Send the previous sexp to the inferior Ruby process."
-  (interactive)
-  (ruby-send-region (save-excursion (ruby-backward-sexp) (point)) (point)))
+  (interactive "P")
+  (ruby-send-region (save-excursion (ruby-backward-sexp) (point)) (point))
+  (when print (ruby-print-result)))
 
-(defun ruby-send-block ()
+(defun ruby-send-block (&optional print)
   "Send the current block to the inferior Ruby process."
-  (interactive)
+  (interactive "P")
   (save-excursion
     (ruby-end-of-block)
     (end-of-line)
     (let ((end (point)))
       (ruby-beginning-of-block)
-      (ruby-send-region (point) end))))
+      (ruby-send-region (point) end)))
+  (when print (ruby-print-result)))
 
 (defvar ruby-last-ruby-buffer nil
   "The last buffer we switched to `inf-ruby' from.")
