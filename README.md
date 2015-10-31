@@ -10,11 +10,11 @@ you will need to get [package.el](http://bit.ly/pkg-el23) yourself if you wish t
 `inf-ruby` is available on both major `package.el` community
 maintained repos:
 [Marmalade](http://marmalade-repo.org/packages/inf-ruby) and
-[MELPA](http://melpa.milkbox.net/#/inf-ruby).
+[MELPA](https://melpa.org/#/inf-ruby).
 
 If you're not already using one of them, follow their installation instructions:
 [Marmalade](http://marmalade-repo.org/),
-[MELPA](http://melpa.milkbox.net/#/getting-started).
+[MELPA](https://melpa.org/#/getting-started).
 
 And then you can install `inf-ruby` with the following command:
 
