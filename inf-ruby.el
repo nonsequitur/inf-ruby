@@ -68,7 +68,8 @@
 
 (eval-when-compile
   (defvar rspec-compilation-mode-map)
-  (defvar ruby-compilation-mode-map))
+  (defvar ruby-compilation-mode-map)
+  (defvar projectile-rails-server-mode-map))
 
 (defgroup inf-ruby nil
   "Run Ruby process in a buffer"
@@ -611,6 +612,9 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
        'inf-ruby-switch-from-compilation))
   (eval-after-load 'ruby-compilation
     '(define-key ruby-compilation-mode-map (kbd "C-x C-q")
+       'inf-ruby-switch-from-compilation))
+  (eval-after-load 'projectile-rails-server-mode
+    '(define-key projectile-rails-server-mode-map (kbd "C-x C-q")
        'inf-ruby-switch-from-compilation)))
 
 (defvar inf-ruby-console-patterns-alist
