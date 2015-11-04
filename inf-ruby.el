@@ -613,7 +613,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
   (eval-after-load 'ruby-compilation
     '(define-key ruby-compilation-mode-map (kbd "C-x C-q")
        'inf-ruby-switch-from-compilation))
-  (eval-after-load 'projectile-rails-server-mode
+  (eval-after-load 'projectile-rails
     '(define-key projectile-rails-server-mode-map (kbd "C-x C-q")
        'inf-ruby-switch-from-compilation)))
 
