@@ -478,7 +478,7 @@ Then switch to the process buffer."
 (defun ruby-send-buffer ()
   "Send the current buffer to the inferior Ruby process."
   (interactive)
-  (ruby-send-region 1 (point-max)))
+  (ruby-send-region (point-min) (point-max)))
 
 (defun ruby-escape-single-quoted (str)
   "Escape single quotes, double quotes and newlines in STR."
