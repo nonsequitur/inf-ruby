@@ -475,6 +475,13 @@ Then switch to the process buffer."
                                               file-name
                                               "\"\)\n")))
 
+(defun ruby-send-buffer ()
+  "Send the current buffer to the inferior Ruby process."
+  (interactive)
+  (save-restriction
+    (widen)
+    (ruby-send-region (point-min) (point-max))))
+
 (defun ruby-escape-single-quoted (str)
   "Escape single quotes, double quotes and newlines in STR."
   (replace-regexp-in-string "'" "\\\\'"
