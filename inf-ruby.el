@@ -634,8 +634,9 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
-(defvar inf-ruby-breakpoint-pattern "\\[1\\] pry(" "Pattern to check if the
-current line indicates the current compilation mode entered a breakpoint")
+(defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
+  "Pattern to check if the current line indicates the current compilation mode
+entered a breakpoint")
 
 (defun inf-ruby-console-match (dir)
   "Find matching console command for DIR, if any."
