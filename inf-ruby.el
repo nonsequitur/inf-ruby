@@ -634,6 +634,9 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
+(defvar inf-ruby-breakpoint-pattern "\\[1\\] pry(" "Pattern to check if the
+current line indicates the current compilation mode entered a breakpoint")
+
 (defun inf-ruby-console-match (dir)
   "Find matching console command for DIR, if any."
   (catch 'type
@@ -730,6 +733,13 @@ Gemfile, it should use the `gemspec' instruction."
   (interactive "D")
   (let ((default-directory (file-name-as-directory dir)))
     (run-ruby "bundle exec racksh" "racksh")))
+
+(defun inf-ruby-auto-enter ()
+  "Automatically enters inf-ruby mode when it sees a breakpoint-indicating pattern."
+  (when (member major-mode '(rspec-compilation-mode ruby-compilation-mode projectile-rails-server-mode))
+    (beginning-of-line)
+    (when (re-search-forward inf-ruby-breakpoint-pattern (line-end-position) t)
+      (inf-ruby-switch-from-compilation))))
 
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
