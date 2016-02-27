@@ -736,13 +736,13 @@ Gemfile, it should use the `gemspec' instruction."
     (run-ruby "bundle exec racksh" "racksh")))
 
 (defun inf-ruby-in-ruby-compilation-modes (mode-var)
-  "Checks if MODE-VAR is a ruby compilation mode"
+  "Check if MODE-VAR is a ruby compilation mode"
   (member mode-var '(rspec-compilation-mode
                      ruby-compilation-mode
                      projectile-rails-server-mode)))
 
 (defun inf-ruby-auto-enter ()
-  "Automatically enters inf-ruby mode when it sees a breakpoint-indicating pattern."
+  "Automatically enter inf-ruby mode if the breakpoint pattern matches the current line."
   (when (inf-ruby-in-ruby-compilation-modes major-mode)
     (save-excursion
       (beginning-of-line)
@@ -751,8 +751,7 @@ Gemfile, it should use the `gemspec' instruction."
         (inf-ruby-switch-from-compilation)))))
 
 (defun inf-ruby-auto-exit (input)
-  "Checks if the current input is a debugger exit command and returns
-to the previous compilation mode if t."
+  "Check the current input is a debugger exit command and return to the previous compilation mode if t."
   (when (inf-ruby-in-ruby-compilation-modes inf-ruby-orig-compilation-mode)
     (if (member input '("quit" "exit" ""))
         (inf-ruby-maybe-switch-to-compilation))))
