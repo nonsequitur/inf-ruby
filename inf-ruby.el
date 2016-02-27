@@ -635,8 +635,8 @@ one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
 (defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
-  "Pattern to check if the current line indicates the current compilation mode
-entered a breakpoint")
+  "Pattern found when a breakpoint is triggered in a compilation session.
+This checks if the current line is a pry or ruby-debug prompt.")
 
 (defun inf-ruby-console-match (dir)
   "Find matching console command for DIR, if any."
@@ -736,7 +736,7 @@ Gemfile, it should use the `gemspec' instruction."
     (run-ruby "bundle exec racksh" "racksh")))
 
 (defmacro in-ruby-compilation-modes (mode-var &rest body)
-  "Checks if we're in a ruby compilation mode, and runs BODY in an
+  "Checks if MODE-VAR is a ruby compilation mode, and runs BODY in an
 implicit progn if t."
   `(when (member ,mode-var '(rspec-compilation-mode
                               ruby-compilation-mode
