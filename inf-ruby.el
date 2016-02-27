@@ -634,7 +634,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
-(defvar inf-ruby-breakpoint-pattern ".*\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
+(defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
   "Pattern found when a breakpoint is triggered in a compilation session.
 This checks if the current line is a pry or ruby-debug prompt.")
 
@@ -746,7 +746,8 @@ Gemfile, it should use the `gemspec' instruction."
   (when (inf-ruby-in-ruby-compilation-modes major-mode)
     (save-excursion
       (beginning-of-line)
-      (when (looking-at inf-ruby-breakpoint-pattern)
+      (when (re-search-forward inf-ruby-breakpoint-pattern
+                               (line-end-position) t)
         (inf-ruby-switch-from-compilation)))))
 
 (defun inf-ruby-auto-exit (input)
