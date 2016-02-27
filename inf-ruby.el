@@ -753,7 +753,7 @@ Gemfile, it should use the `gemspec' instruction."
   "Checks if the current input is a debugger exit command and returns
 to the previous compilation mode if t."
   (when (inf-ruby-in-ruby-compilation-modes inf-ruby-orig-compilation-mode)
-    (if (member input '("quit" "exit"))
+    (if (member input '("quit" "exit" ""))
         (inf-ruby-maybe-switch-to-compilation))))
 
 (defun inf-ruby-setup-auto-breakpoint ()
