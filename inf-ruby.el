@@ -634,7 +634,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
-(defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
+(defvar inf-ruby-breakpoint-pattern ".*\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
   "Pattern found when a breakpoint is triggered in a compilation session.
 This checks if the current line is a pry or ruby-debug prompt.")
 
@@ -735,28 +735,26 @@ Gemfile, it should use the `gemspec' instruction."
   (let ((default-directory (file-name-as-directory dir)))
     (run-ruby "bundle exec racksh" "racksh")))
 
-(defmacro in-ruby-compilation-modes (mode-var &rest body)
-  "Checks if MODE-VAR is a ruby compilation mode, and runs BODY in an
-implicit progn if t."
-  `(when (member ,mode-var '(rspec-compilation-mode
-                              ruby-compilation-mode
-                              projectile-rails-server-mode))
-     (progn ,@body)))
+(defun inf-ruby-in-ruby-compilation-modes (mode-var)
+  "Checks if MODE-VAR is a ruby compilation mode"
+  (member mode-var '(rspec-compilation-mode
+                     ruby-compilation-mode
+                     projectile-rails-server-mode)))
 
 (defun inf-ruby-auto-enter ()
   "Automatically enters inf-ruby mode when it sees a breakpoint-indicating pattern."
-  (in-ruby-compilation-modes major-mode
-                             (save-excursion
-                               (beginning-of-line)
-                               (when (looking-at inf-ruby-breakpoint-pattern)
-                                 (inf-ruby-switch-from-compilation)))))
+  (when (inf-ruby-in-ruby-compilation-modes major-mode)
+    (save-excursion
+      (beginning-of-line)
+      (when (looking-at inf-ruby-breakpoint-pattern)
+        (inf-ruby-switch-from-compilation)))))
 
 (defun inf-ruby-auto-exit (input)
   "Checks if the current input is a debugger exit command and returns
 to the previous compilation mode if t."
-  (in-ruby-compilation-modes inf-ruby-orig-compilation-mode
-                             (if (member input '("quit" "exit"))
-                                 (inf-ruby-maybe-switch-to-compilation))))
+  (when (inf-ruby-in-ruby-compilation-modes inf-ruby-orig-compilation-mode)
+    (if (member input '("quit" "exit"))
+        (inf-ruby-maybe-switch-to-compilation))))
 
 (defun inf-ruby-setup-auto-breakpoint ()
   (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
