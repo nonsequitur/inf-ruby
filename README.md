@@ -60,7 +60,7 @@ automatically.
 Additionally, consider adding
 
 ```lisp
-(add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+(inf-ruby-setup-auto-breakpoint)
 ```
 
 to your init file to automatically switch from common Ruby compilation

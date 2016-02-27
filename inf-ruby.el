@@ -735,12 +735,36 @@ Gemfile, it should use the `gemspec' instruction."
   (let ((default-directory (file-name-as-directory dir)))
     (run-ruby "bundle exec racksh" "racksh")))
 
+(defmacro in-ruby-compilation-modes (mode-var &rest body)
+  "Checks if we're in a ruby compilation mode, and runs BODY in an
+implicit progn if t."
+  `(when (member ,mode-var '(rspec-compilation-mode
+                              ruby-compilation-mode
+                              projectile-rails-server-mode))
+     (progn ,@body)))
+
 (defun inf-ruby-auto-enter ()
   "Automatically enters inf-ruby mode when it sees a breakpoint-indicating pattern."
-  (when (member major-mode '(rspec-compilation-mode ruby-compilation-mode projectile-rails-server-mode))
-    (beginning-of-line)
-    (when (re-search-forward inf-ruby-breakpoint-pattern (line-end-position) t)
-      (inf-ruby-switch-from-compilation))))
+  (in-ruby-compilation-modes major-mode
+                             (save-excursion
+                               (beginning-of-line)
+                               (when (looking-at inf-ruby-breakpoint-pattern)
+                                 (inf-ruby-switch-from-compilation)))))
+
+(defun inf-ruby-auto-exit (input)
+  "Checks if the current input is a debugger exit command and returns
+to the previous compilation mode if t."
+  (in-ruby-compilation-modes inf-ruby-orig-compilation-mode
+                             (if (member input '("quit" "exit"))
+                                 (inf-ruby-maybe-switch-to-compilation))))
+
+(defun inf-ruby-setup-auto-breakpoint ()
+  (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+  (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit))
+
+(defun inf-ruby-remove-auto-breakpoint ()
+  (remove-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+  (remove-hook 'comint-input-filter-functions 'inf-ruby-auto-exit))
 
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
