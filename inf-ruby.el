@@ -743,18 +743,20 @@ Gemfile, it should use the `gemspec' instruction."
 
 (defun inf-ruby-auto-enter ()
   "Switch to `inf-ruby-mode' if the breakpoint pattern matches the current line."
-  (when (inf-ruby-in-ruby-compilation-modes major-mode)
-    (save-excursion
-      (beginning-of-line)
-      (when (re-search-forward inf-ruby-breakpoint-pattern
-                               (line-end-position) t)
-        (inf-ruby-switch-from-compilation)))))
+  (when (and (inf-ruby-in-ruby-compilation-modes major-mode)
+             (save-excursion
+               (beginning-of-line)
+               (re-search-forward inf-ruby-breakpoint-pattern nil t)))
+    ;; Exiting excursion before this call to get the prompt fontified.
+    (inf-ruby-switch-from-compilation)))
 
 (defun inf-ruby-auto-exit (input)
   "Return to the previous compilation mode if INPUT is a debugger exit command."
   (when (inf-ruby-in-ruby-compilation-modes inf-ruby-orig-compilation-mode)
-    (if (member input '("quit" "exit" ""))
-        (inf-ruby-maybe-switch-to-compilation))))
+    (if (member input '("quit\n" "exit\n" ""))
+        ;; After the current command completes, otherwise we get a
+        ;; marker error.
+        (run-with-idle-timer 0 nil #'inf-ruby-maybe-switch-to-compilation))))
 
 (defun inf-ruby-setup-auto-breakpoint ()
   (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
