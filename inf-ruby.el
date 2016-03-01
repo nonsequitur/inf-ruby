@@ -47,9 +47,10 @@
 ;;
 ;; Additionally, consider adding
 ;;
-;;    (add-hook 'after-init-hook 'inf-ruby-switch-setup)
+;;    (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+;;    (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit)
 ;;
-;; to your init file to easily switch from common Ruby compilation
+;; to your init file to automatically switch from common Ruby compilation
 ;; modes to interact with a debugger.
 ;;
 ;; To call `inf-ruby-console-auto' more easily, you can, for example,
@@ -741,6 +742,7 @@ Gemfile, it should use the `gemspec' instruction."
                  ruby-compilation-mode
                  projectile-rails-server-mode)))
 
+;;;###autoload
 (defun inf-ruby-auto-enter ()
   "Switch to `inf-ruby-mode' if the breakpoint pattern matches the current line."
   (when (and (inf-ruby-in-ruby-compilation-modes major-mode)
@@ -750,6 +752,7 @@ Gemfile, it should use the `gemspec' instruction."
     ;; Exiting excursion before this call to get the prompt fontified.
     (inf-ruby-switch-from-compilation)))
 
+;;;###autoload
 (defun inf-ruby-auto-exit (input)
   "Return to the previous compilation mode if INPUT is a debugger exit command."
   (when (inf-ruby-in-ruby-compilation-modes inf-ruby-orig-compilation-mode)
@@ -758,11 +761,13 @@ Gemfile, it should use the `gemspec' instruction."
         ;; marker error.
         (run-with-idle-timer 0 nil #'inf-ruby-maybe-switch-to-compilation))))
 
-(defun inf-ruby-setup-auto-breakpoint ()
+(defun inf-ruby-enable-auto-breakpoint ()
+  (interactive)
   (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
   (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit))
 
-(defun inf-ruby-remove-auto-breakpoint ()
+(defun inf-ruby-disable-auto-breakpoint ()
+  (interactive)
   (remove-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
   (remove-hook 'comint-input-filter-functions 'inf-ruby-auto-exit))
 
