@@ -61,7 +61,6 @@ Additionally, consider adding
 
 ```lisp
 (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
-(add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit)
 ```
 
 to your init file to automatically switch from common Ruby compilation

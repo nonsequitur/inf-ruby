@@ -48,7 +48,6 @@
 ;; Additionally, consider adding
 ;;
 ;;    (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
-;;    (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit)
 ;;
 ;; to your init file to automatically switch from common Ruby compilation
 ;; modes to interact with a debugger.
@@ -750,7 +749,8 @@ Gemfile, it should use the `gemspec' instruction."
                (beginning-of-line)
                (re-search-forward inf-ruby-breakpoint-pattern nil t)))
     ;; Exiting excursion before this call to get the prompt fontified.
-    (inf-ruby-switch-from-compilation)))
+    (inf-ruby-switch-from-compilation)
+    (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit nil t)))
 
 ;;;###autoload
 (defun inf-ruby-auto-exit (input)
@@ -763,13 +763,11 @@ Gemfile, it should use the `gemspec' instruction."
 
 (defun inf-ruby-enable-auto-breakpoint ()
   (interactive)
-  (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
-  (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit))
+  (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter))
 
 (defun inf-ruby-disable-auto-breakpoint ()
   (interactive)
-  (remove-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
-  (remove-hook 'comint-input-filter-functions 'inf-ruby-auto-exit))
+  (remove-hook 'compilation-filter-hook 'inf-ruby-auto-enter))
 
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
