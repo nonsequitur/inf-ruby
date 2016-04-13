@@ -393,7 +393,7 @@ Must not contain ruby meta characters.")
   "Send the current definition to the inferior Ruby process."
   (interactive)
   (save-excursion
-    (ruby-end-of-defun)
+    (end-of-defun)
     (let ((end (point)))
       (ruby-beginning-of-defun)
       (ruby-send-region (point) end))))
