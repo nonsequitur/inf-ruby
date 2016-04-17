@@ -237,6 +237,11 @@ The following commands are available:
       (setq mode-line-process orig-mode-line-process)))
   (setq comint-prompt-regexp inf-ruby-prompt-pattern)
   (ruby-mode-variables)
+  (when (bound-and-true-p ruby-use-smie)
+    (set (make-local-variable 'smie-forward-token-function)
+         #'inf-ruby-smie--forward-token)
+    (set (make-local-variable 'smie-backward-token-function)
+         #'inf-ruby-smie--backward-token))
   (setq major-mode 'inf-ruby-mode)
   (setq mode-name "Inf-Ruby")
   (use-local-map inf-ruby-mode-map)
@@ -792,6 +797,14 @@ Gemfile, it should use the `gemspec' instruction."
       (if match-group
           (match-string match-group)
         t))))
+
+(defun inf-ruby-smie--forward-token ()
+  (let ((inhibit-field-text-motion t))
+    (ruby-smie--forward-token)))
+
+(defun inf-ruby-smie--backward-token ()
+  (let ((inhibit-field-text-motion t))
+    (ruby-smie--backward-token)))
 
 ;;;###autoload (dolist (mode ruby-source-modes) (add-hook (intern (format "%s-hook" mode)) 'inf-ruby-minor-mode))
 
