@@ -639,7 +639,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 one of the predicates matches, then calls `inf-ruby-console-NAME',
 passing it the found directory.")
 
-(defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)"
+(defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)\\|\\((byebug)\\)"
   "Pattern found when a breakpoint is triggered in a compilation session.
 This checks if the current line is a pry or ruby-debug prompt.")
 
