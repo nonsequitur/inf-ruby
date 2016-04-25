@@ -585,8 +585,7 @@ interactive mode, i.e. hits a debugger breakpoint."
   (let ((mode major-mode)
         (arguments compilation-arguments))
     (inf-ruby-mode)
-    (make-local-variable 'inf-ruby-orig-compilation-mode)
-    (setq inf-ruby-orig-compilation-mode mode)
+    (set (make-local-variable 'inf-ruby-orig-compilation-mode) mode)
     (set (make-local-variable 'compilation-arguments) arguments))
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
