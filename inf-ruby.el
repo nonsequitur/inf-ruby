@@ -598,8 +598,7 @@ interactive mode, i.e. hits a debugger breakpoint."
     (set (make-local-variable 'compilation-arguments) arguments))
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
-      (make-local-variable 'inf-ruby-orig-process-filter)
-      (setq inf-ruby-orig-process-filter (process-filter proc))
+      (set (make-local-variable 'inf-ruby-orig-process-filter) (process-filter proc))
       (set-process-filter proc 'comint-output-filter))
     (when (looking-back inf-ruby-prompt-pattern (line-beginning-position))
       (let ((line (match-string 0)))
