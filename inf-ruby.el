@@ -720,7 +720,8 @@ Gemfile, it should use the `gemspec' instruction."
           (setq args (concat " -r " feature))
         ;; Let's require all non-directory files under lib, instead.
         (dolist (item (directory-files "lib"))
-          (unless (file-directory-p (format "lib/%s" item))
+          (when (and (not (file-directory-p (format "lib/%s" item)))
+                     (string-match-p "\\.rb\\'" item))
             (push item files)))
         (setq args
               (mapconcat
