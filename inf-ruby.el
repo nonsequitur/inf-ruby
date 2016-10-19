@@ -709,7 +709,7 @@ Gemfile, it should use the `gemspec' instruction."
                 "bundle exec irb -I lib")
             "irb -I lib"))
          (name (inf-ruby-file-contents-match
-                gemspec "\\.name[ \t]*=[ \t]*\"\\([^\"]+\\)\"" 1))
+                gemspec "\\.name[ \t]*=[ \t]*[\'\"]\\([^\"\n]+\\)[\'\"]" 1))
          args files)
     (unless (file-exists-p "lib")
       (error "The directory must contain a 'lib' subdirectory"))
