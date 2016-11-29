@@ -714,6 +714,7 @@ automatically."
 
 ;;;###autoload
 (defun inf-ruby-console-zeus (dir)
+  "Run Rails console in DIR using Zeus."
   (interactive "D")
   (let ((default-directory (file-name-as-directory dir))
         (exec-prefix (if (executable-find "zeus") "" "bundle exec ")))
