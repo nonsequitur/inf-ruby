@@ -630,7 +630,8 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
        'inf-ruby-switch-from-compilation)))
 
 (defvar inf-ruby-console-patterns-alist
-  '((inf-ruby-console-rails-p . rails)
+  '((".zeus.sock" . zeus)
+    (inf-ruby-console-rails-p . rails)
     ("*.gemspec" . gem)
     (inf-ruby-console-racksh-p . racksh)
     ("Gemfile" . default))
@@ -657,7 +658,7 @@ This checks if the current line is a pry or ruby-debug prompt.")
 ;;;###autoload
 (defun inf-ruby-console-auto ()
   "Run the appropriate Ruby console command.
-The command and and the directory to run it from are detected
+The command and the directory to run it from are detected
 automatically."
   (interactive)
   (let* ((dir (locate-dominating-file default-directory
@@ -673,6 +674,13 @@ automatically."
        (file-exists-p "config/application.rb")
        (inf-ruby-file-contents-match "config/application.rb"
                                      "\\_<Rails::Application\\_>")))
+
+;;;###autoload
+(defun inf-ruby-console-zeus (dir)
+  (interactive "D")
+  (let ((default-directory (file-name-as-directory dir))
+        (exec-prefix (if (executable-find "zeus") "" "bundle exec ")))
+    (run-ruby (concat exec-prefix "zeus console") "zeus")))
 
 ;;;###autoload
 (defun inf-ruby-console-rails (dir)
