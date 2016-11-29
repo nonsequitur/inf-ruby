@@ -458,6 +458,7 @@ Must not contain ruby meta characters.")
 
 (defvar ruby-last-ruby-buffer nil
   "The last buffer we switched to `inf-ruby' from.")
+(make-variable-buffer-local 'ruby-last-ruby-buffer)
 
 (defun ruby-remember-ruby-buffer (buffer)
   (setq ruby-last-ruby-buffer buffer))
