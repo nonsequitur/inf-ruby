@@ -830,6 +830,8 @@ Gemfile, it should use the `gemspec' instruction."
     (cond
      ((file-exists-p "console.rb")
       (run-ruby "bundle exec ruby console.rb" "console.rb"))
+     ((file-executable-p "console")
+      (run-ruby "bundle exec console" "console.rb"))
      ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
       (run-ruby "bundle exec pry" "pry"))
      (t
