@@ -81,7 +81,8 @@ A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
 To launch a REPL with project-specific console instead, type <kbd>M-x inf-ruby-console-auto</kbd>.
 It recognizes several project types, including Rails, gems and anything with `racksh` in their Gemfile.
 
-Customization: When entered, this mode runs `comint-mode-hook` and
+### Hooks
+When entered, this mode runs `comint-mode-hook` and
 `inf-ruby-mode-hook` (in that order).
 
 ### Commands
