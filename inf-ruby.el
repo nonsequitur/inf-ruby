@@ -307,10 +307,10 @@ The following commands are available:
 (defun inf-ruby (&optional impl)
   "Run an inferior Ruby process in a buffer.
 With prefix argument, prompts for which Ruby implementation
-\(from the list `inf-ruby-implementations') to use.  Runs the
-hooks `inf-ruby-mode-hook' \(after the `comint-mode-hook' is
-run)."
+\(from the list `inf-ruby-implementations') to use.
 
+If there is a Ruby process running in an existing buffer, switch
+to that buffer. Otherwise create a new buffer."
   (interactive (list (if current-prefix-arg
                          (completing-read "Ruby Implementation: "
                                           (mapc #'car inf-ruby-implementations))
@@ -318,50 +318,53 @@ run)."
   (setq impl (or impl "ruby"))
 
   (let ((command (cdr (assoc impl inf-ruby-implementations))))
-    (run-ruby command impl)))
+    (run-ruby-or-pop-to-buffer command impl
+                               (or (inf-ruby-buffer)
+                                   inf-ruby-buffer))))
 
 ;;;###autoload
-(defun run-ruby (&optional command name)
-  "Run an inferior Ruby process in a buffer related to the current project.
-If there is a process already running in a corresponding buffer,
-switch to that buffer. Otherwise create a new buffer.
+(defun run-ruby (command &optional name)
+  "Run an inferior Ruby process, input and output in a buffer.
+
 The consecutive buffer names will be:
 `*NAME*', `*NAME*<2>', `*NAME*<3>' and so on.
 
-NAME defaults to \"ruby\". COMMAND defaults to the default entry
-in `inf-ruby-implementations'.
+NAME defaults to \"ruby\".
+
+Runs the hooks `comint-mode-hook' and `inf-ruby-mode-hook'.
 
 \(Type \\[describe-mode] in the process buffer for the list of commands.)"
-
-  (interactive)
-  (setq command (or command (cdr (assoc inf-ruby-default-implementation
-                                        inf-ruby-implementations))))
   (setq name (or name "ruby"))
 
-  (if (not (comint-check-proc (inf-ruby-buffer)))
-      (let ((commandlist (split-string-and-unquote command))
-            (buffer (current-buffer))
-            (process-environment process-environment))
-        ;; http://debbugs.gnu.org/15775
-        (setenv "PAGER" (executable-find "cat"))
-        (set-buffer (apply 'make-comint-in-buffer
-                           name
-                           (generate-new-buffer-name (format "*%s*" name))
-                           (car commandlist)
-                           nil (cdr commandlist)))
-        (inf-ruby-mode)
-        (ruby-remember-ruby-buffer buffer)
-        (push (current-buffer) inf-ruby-buffers)
-        (setq inf-ruby-buffer-impl-name name
-              inf-ruby-buffer-command command)))
+  (let ((commandlist (split-string-and-unquote command))
+        (buffer (current-buffer))
+        (process-environment process-environment))
+    ;; http://debbugs.gnu.org/15775
+    (setenv "PAGER" (executable-find "cat"))
+    (set-buffer (apply 'make-comint-in-buffer
+                       name
+                       (generate-new-buffer-name (format "*%s*" name))
+                       (car commandlist)
+                       nil (cdr commandlist)))
+    (inf-ruby-mode)
+    (ruby-remember-ruby-buffer buffer)
+    (push (current-buffer) inf-ruby-buffers)
+    (setq inf-ruby-buffer-impl-name name
+          inf-ruby-buffer-command command))
 
-  (let ((buffer (inf-ruby-buffer)))
-    (with-current-buffer buffer
-      (if (and (string= inf-ruby-buffer-impl-name name)
-               (string= inf-ruby-buffer-command command))
-          (pop-to-buffer (setq inf-ruby-buffer buffer))
-        (error "Found inf-ruby buffer for directory %s but it was run with different COMMAND and/or NAME."
-               (expand-file-name default-directory))))))
+  (pop-to-buffer (setq inf-ruby-buffer (current-buffer))))
+
+(defun run-ruby-or-pop-to-buffer (command &optional name buffer)
+  (if (not (and buffer
+                (comint-check-proc buffer)))
+      (run-ruby command name)
+    (pop-to-buffer buffer)
+    (unless (and (string= inf-ruby-buffer-impl-name name)
+                 (string= inf-ruby-buffer-command command))
+      (error (concat "Found inf-ruby buffer, but it was created using "
+                     "a different NAME-COMMAND combination: %s %s")
+             inf-ruby-buffer-impl-name
+             inf-ruby-buffer-command))))
 
 (defun inf-ruby-proc ()
   "Return the inferior Ruby process for the current buffer or project.
