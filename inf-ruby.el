@@ -293,9 +293,10 @@ The following commands are available:
 (defun inf-ruby-buffer ()
   "Return inf-ruby buffer for the current buffer or project."
   (catch 'buffer
-    (let ((current-dir (expand-file-name
-                        (locate-dominating-file default-directory
-                                                #'inf-ruby-console-match))))
+    (let ((current-dir (locate-dominating-file default-directory
+                                               #'inf-ruby-console-match)))
+      (unless current-dir (throw 'buffer nil))
+      (setq current-dir (expand-file-name current-dir))
       (dolist (buffer inf-ruby-buffers)
         (when (buffer-live-p buffer)
           (with-current-buffer buffer
