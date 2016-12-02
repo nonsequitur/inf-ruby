@@ -372,7 +372,8 @@ Runs the hooks `comint-mode-hook' and `inf-ruby-mode-hook'.
 See variable `inf-ruby-buffers'."
   (or (get-buffer-process (if (eq major-mode 'inf-ruby-mode)
                               (current-buffer)
-                            (inf-ruby-buffer)))
+                            (or (inf-ruby-buffer)
+                                inf-ruby-buffer)))
       (error "No current process. See variable inf-ruby-buffers")))
 
 ;; These commands are added to the ruby-mode keymap:
