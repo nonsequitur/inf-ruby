@@ -376,7 +376,7 @@ See variable `inf-ruby-buffers'."
                                 inf-ruby-buffer)))
       (error "No current process. See variable inf-ruby-buffers")))
 
-;; These commands are added to the ruby-mode keymap:
+;; These commands are added to the inf-ruby-minor-mode keymap:
 
 (defconst ruby-send-terminator "--inf-ruby-%x-%d-%d-%d--"
   "Template for irb here document terminator.
