@@ -324,7 +324,7 @@ to that buffer. Otherwise create a new buffer."
 
 ;;;###autoload
 (defun run-ruby (command &optional name)
-  "Run an inferior Ruby process, input and output in a buffer.
+  "Run an inferior Ruby process, input and output in a new buffer.
 
 The consecutive buffer names will be:
 `*NAME*', `*NAME*<2>', `*NAME*<3>' and so on.
