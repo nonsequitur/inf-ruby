@@ -99,6 +99,13 @@ Also see the description of `ielm-prompt-read-only'."
                            inf-ruby-implementations))
   :group 'inf-ruby)
 
+(defcustom inf-ruby-jump-to-end-of-buffer nil
+  "If non-nil, `inf-ruby-switch-from-compilation' will jump to end of buffer.
+
+In this way the point will be in the prompt."
+  :type 'boolean
+  :group 'inf-ruby)
+
 (defconst inf-ruby-prompt-format
   (concat
    (mapconcat
@@ -628,16 +635,16 @@ interactive mode, i.e. hits a debugger breakpoint."
   (interactive)
   (setq buffer-read-only nil)
   (buffer-enable-undo)
+  (when inf-ruby-jump-to-end-of-buffer
+    (goto-char (point-max)))
   (let ((mode major-mode)
         (arguments compilation-arguments))
     (inf-ruby-mode)
-    (make-local-variable 'inf-ruby-orig-compilation-mode)
-    (setq inf-ruby-orig-compilation-mode mode)
+    (set (make-local-variable 'inf-ruby-orig-compilation-mode) mode)
     (set (make-local-variable 'compilation-arguments) arguments))
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
-      (make-local-variable 'inf-ruby-orig-process-filter)
-      (setq inf-ruby-orig-process-filter (process-filter proc))
+      (set (make-local-variable 'inf-ruby-orig-process-filter) (process-filter proc))
       (set-process-filter proc 'comint-output-filter))
     (when (looking-back inf-ruby-prompt-pattern (line-beginning-position))
       (let ((line (match-string 0)))
