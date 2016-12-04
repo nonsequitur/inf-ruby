@@ -292,16 +292,19 @@ The following commands are available:
 
 (defun inf-ruby-buffer ()
   "Return inf-ruby buffer for the current buffer or project."
+  (let ((current-dir (locate-dominating-file default-directory
+                                             #'inf-ruby-console-match)))
+    (and current-dir
+         (inf-ruby-buffer-in-directory current-dir))))
+
+(defun inf-ruby-buffer-in-directory (dir)
+  (setq dir (expand-file-name dir))
   (catch 'buffer
-    (let ((current-dir (locate-dominating-file default-directory
-                                               #'inf-ruby-console-match)))
-      (unless current-dir (throw 'buffer nil))
-      (setq current-dir (expand-file-name current-dir))
-      (dolist (buffer inf-ruby-buffers)
-        (when (buffer-live-p buffer)
-          (with-current-buffer buffer
-            (when (string= (expand-file-name default-directory) current-dir)
-              (throw 'buffer buffer))))))))
+    (dolist (buffer inf-ruby-buffers)
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer
+          (when (string= (expand-file-name default-directory) dir)
+            (throw 'buffer buffer)))))))
 
 ;;;###autoload
 (defun inf-ruby (&optional impl)
@@ -362,7 +365,7 @@ Runs the hooks `comint-mode-hook' and `inf-ruby-mode-hook'.
     (unless (and (string= inf-ruby-buffer-impl-name name)
                  (string= inf-ruby-buffer-command command))
       (error (concat "Found inf-ruby buffer, but it was created using "
-                     "a different NAME-COMMAND combination: %s %s")
+                     "a different NAME-COMMAND combination: %s, `%s'")
              inf-ruby-buffer-impl-name
              inf-ruby-buffer-command))))
 
@@ -730,13 +733,17 @@ automatically."
    (error "No matching directory for %s console found"
           (capitalize (symbol-name type)))))
 
+(defun inf-ruby-console-run (command name)
+  (run-ruby-or-pop-to-buffer command name
+                             (inf-ruby-buffer-in-directory default-directory)))
+
 ;;;###autoload
 (defun inf-ruby-console-zeus (dir)
   "Run Rails console in DIR using Zeus."
   (interactive (list (inf-ruby-console-read-directory 'zeus)))
   (let ((default-directory (file-name-as-directory dir))
         (exec-prefix (if (executable-find "zeus") "" "bundle exec ")))
-    (run-ruby (concat exec-prefix "zeus console") "zeus")))
+    (inf-ruby-console-run (concat exec-prefix "zeus console") "zeus")))
 
 ;;;###autoload
 (defun inf-ruby-console-rails (dir)
@@ -747,10 +754,11 @@ automatically."
          (env (completing-read "Rails environment: " envs nil t
                                nil nil (car (member "development" envs))))
          (with-bundler (file-exists-p "Gemfile")))
-    (run-ruby (concat (when with-bundler "bundle exec ")
-                      "rails console "
-                      env)
-              "rails")))
+    (inf-ruby-console-run
+     (concat (when with-bundler "bundle exec ")
+             "rails console "
+             env)
+     "rails")))
 
 (defun inf-ruby-console-rails-envs ()
   (let ((files (file-expand-wildcards "config/environments/*.rb")))
@@ -793,7 +801,7 @@ Gemfile, it should use the `gemspec' instruction."
                  (concat " -r " (file-name-sans-extension file)))
                files
                ""))))
-    (run-ruby (concat base-command args) "gem")))
+    (inf-ruby-console-run (concat base-command args) "gem")))
 
 (defun inf-ruby-console-racksh-p ()
   (and (file-exists-p "Gemfile.lock")
@@ -803,7 +811,7 @@ Gemfile, it should use the `gemspec' instruction."
   "Run racksh in DIR."
   (interactive (list (inf-ruby-console-read-directory 'racksh)))
   (let ((default-directory (file-name-as-directory dir)))
-    (run-ruby "bundle exec racksh" "racksh")))
+    (inf-ruby-console-run "bundle exec racksh" "racksh")))
 
 (defun inf-ruby-in-ruby-compilation-modes (mode)
   "Check if MODE is a Ruby compilation mode."
@@ -848,13 +856,13 @@ Gemfile, it should use the `gemspec' instruction."
       (error "The directory must contain a Gemfile"))
     (cond
      ((file-exists-p "console.rb")
-      (run-ruby "bundle exec ruby console.rb" "console.rb"))
+      (inf-ruby-console-run "bundle exec ruby console.rb" "console.rb"))
      ((file-executable-p "console")
-      (run-ruby "bundle exec console" "console.rb"))
+      (inf-ruby-console-run "bundle exec console" "console.rb"))
      ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
-      (run-ruby "bundle exec pry" "pry"))
+      (inf-ruby-console-run "bundle exec pry" "pry"))
      (t
-      (run-ruby "bundle console")))))
+      (inf-ruby-console-run "bundle console" "bundle console")))))
 
 ;;;###autoload
 (defun inf-ruby-file-contents-match (file regexp &optional match-group)
