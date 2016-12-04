@@ -211,7 +211,7 @@ The following commands are available:
 (defvar inf-ruby-buffer-impl-name nil "The name of the Ruby shell")
 (make-variable-buffer-local 'inf-ruby-buffer-impl-name)
 
-(defun inf-ruby-mode ()
+(define-derived-mode inf-ruby-mode comint-mode "Inf-Ruby"
   "Major mode for interacting with an inferior Ruby REPL process.
 
 A simple IRB process can be fired up with \\[inf-ruby].
@@ -248,11 +248,6 @@ to continue it.
 The following commands are available:
 
 \\{inf-ruby-mode-map}"
-  (interactive)
-  (let ((orig-mode-line-process mode-line-process))
-    (comint-mode)
-    (when orig-mode-line-process
-      (setq mode-line-process orig-mode-line-process)))
   (setq comint-prompt-regexp inf-ruby-prompt-pattern)
   (ruby-mode-variables)
   (when (bound-and-true-p ruby-use-smie)
@@ -260,9 +255,6 @@ The following commands are available:
          #'inf-ruby-smie--forward-token)
     (set (make-local-variable 'smie-backward-token-function)
          #'inf-ruby-smie--backward-token))
-  (setq major-mode 'inf-ruby-mode)
-  (setq mode-name "Inf-Ruby")
-  (use-local-map inf-ruby-mode-map)
   (add-hook 'comint-output-filter-functions 'inf-ruby-output-filter nil t)
   (setq comint-get-old-input 'inf-ruby-get-old-input)
   (set (make-local-variable 'compilation-error-regexp-alist)
@@ -271,8 +263,7 @@ The following commands are available:
   (when (eq system-type 'windows-nt)
     (setq comint-process-echoes t))
   (add-hook 'completion-at-point-functions 'inf-ruby-completion-at-point nil t)
-  (compilation-shell-minor-mode t)
-  (run-hooks 'inf-ruby-mode-hook))
+  (compilation-shell-minor-mode t))
 
 (defun inf-ruby-output-filter (output)
   "Check if the current prompt is a top-level prompt."
@@ -639,11 +630,14 @@ interactive mode, i.e. hits a debugger breakpoint."
   (setq buffer-read-only nil)
   (buffer-enable-undo)
   (let ((mode major-mode)
-        (arguments compilation-arguments))
+        (arguments compilation-arguments)
+        (orig-mode-line-process mode-line-process))
     (inf-ruby-mode)
     (make-local-variable 'inf-ruby-orig-compilation-mode)
     (setq inf-ruby-orig-compilation-mode mode)
-    (set (make-local-variable 'compilation-arguments) arguments))
+    (set (make-local-variable 'compilation-arguments) arguments)
+    (when orig-mode-line-process
+      (setq mode-line-process orig-mode-line-process)))
   (let ((proc (get-buffer-process (current-buffer))))
     (when proc
       (make-local-variable 'inf-ruby-orig-process-filter)
