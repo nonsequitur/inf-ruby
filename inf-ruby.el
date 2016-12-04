@@ -678,9 +678,9 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
     ("*.gemspec" . gem)
     (inf-ruby-console-racksh-p . racksh)
     ("Gemfile" . default))
-  "Mapping from predicates (wildcard patterns or functions) to name symbols.
+  "Mapping from predicates (wildcard patterns or functions) to type symbols.
 `inf-ruby-console-auto' walks up from the current directory until
-one of the predicates matches, then calls `inf-ruby-console-NAME',
+one of the predicates matches, then calls `inf-ruby-console-TYPE',
 passing it the found directory.")
 
 (defvar inf-ruby-breakpoint-pattern "\\(\\[1\\] pry(\\)\\|\\((rdb:1)\\)\\|\\((byebug)\\)"
@@ -718,10 +718,22 @@ automatically."
        (inf-ruby-file-contents-match "config/application.rb"
                                      "\\_<Rails::Application\\_>")))
 
+(defun inf-ruby-console-read-directory (type)
+  (or
+   (let ((predicate (car (rassq type inf-ruby-console-patterns-alist))))
+     (locate-dominating-file (read-directory-name "" nil nil t)
+                             (if (stringp predicate)
+                                 predicate
+                               (lambda (dir)
+                                 (let ((default-directory dir))
+                                   (funcall predicate))))))
+   (error "No matching directory for %s console found"
+          (capitalize (symbol-name type)))))
+
 ;;;###autoload
 (defun inf-ruby-console-zeus (dir)
   "Run Rails console in DIR using Zeus."
-  (interactive "D")
+  (interactive (list (inf-ruby-console-read-directory 'zeus)))
   (let ((default-directory (file-name-as-directory dir))
         (exec-prefix (if (executable-find "zeus") "" "bundle exec ")))
     (run-ruby (concat exec-prefix "zeus console") "zeus")))
@@ -729,7 +741,7 @@ automatically."
 ;;;###autoload
 (defun inf-ruby-console-rails (dir)
   "Run Rails console in DIR."
-  (interactive "D")
+  (interactive (list (inf-ruby-console-read-directory 'rails)))
   (let* ((default-directory (file-name-as-directory dir))
          (envs (inf-ruby-console-rails-envs))
          (env (completing-read "Rails environment: " envs nil t
@@ -751,7 +763,7 @@ automatically."
   "Run IRB console for the gem in DIR.
 The main module should be loaded automatically.  If DIR contains a
 Gemfile, it should use the `gemspec' instruction."
-  (interactive "D")
+  (interactive (list (inf-ruby-console-read-directory 'gem)))
   (let* ((default-directory (file-name-as-directory dir))
          (gemspec (car (file-expand-wildcards "*.gemspec")))
          (base-command
@@ -789,7 +801,7 @@ Gemfile, it should use the `gemspec' instruction."
 
 (defun inf-ruby-console-racksh (dir)
   "Run racksh in DIR."
-  (interactive "D")
+  (interactive (list (inf-ruby-console-read-directory 'racksh)))
   (let ((default-directory (file-name-as-directory dir)))
     (run-ruby "bundle exec racksh" "racksh")))
 
@@ -830,7 +842,7 @@ Gemfile, it should use the `gemspec' instruction."
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
   "Run custom console.rb, Pry, or bundle console, in DIR."
-  (interactive "D")
+  (interactive (list (inf-ruby-console-read-directory 'default)))
   (let ((default-directory (file-name-as-directory dir)))
     (unless (file-exists-p "Gemfile")
       (error "The directory must contain a Gemfile"))
