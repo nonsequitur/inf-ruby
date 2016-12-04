@@ -99,6 +99,16 @@ Also see the description of `ielm-prompt-read-only'."
                            inf-ruby-implementations))
   :group 'inf-ruby)
 
+(defcustom inf-ruby-console-environment 'ask
+  "Envronment to use for the `inf-ruby-console-*' commands.
+If the value is not a string, ask the user to choose from the
+available ones.  Otherwise, just use the value.
+
+Currently only affects `inf-ruby-console-rails'."
+  :type '(choice
+          (const ask :tag "Ask the user")
+          (string :tag "Environment name")))
+
 (defconst inf-ruby-prompt-format
   (concat
    (mapconcat
@@ -750,15 +760,22 @@ automatically."
   "Run Rails console in DIR."
   (interactive (list (inf-ruby-console-read-directory 'rails)))
   (let* ((default-directory (file-name-as-directory dir))
-         (envs (inf-ruby-console-rails-envs))
-         (env (completing-read "Rails environment: " envs nil t
-                               nil nil (car (member "development" envs))))
+         (env (inf-ruby-console-rails-env))
          (with-bundler (file-exists-p "Gemfile")))
     (inf-ruby-console-run
      (concat (when with-bundler "bundle exec ")
              "rails console "
              env)
      "rails")))
+
+(defun inf-ruby-console-rails-env ()
+  (if (stringp inf-ruby-console-environment)
+      inf-ruby-console-environment
+    (let ((envs (inf-ruby-console-rails-envs)))
+      (completing-read "Rails environment: "
+                       envs
+                       nil t
+                       nil nil (car (member "development" envs))))))
 
 (defun inf-ruby-console-rails-envs ()
   (let ((files (file-expand-wildcards "config/environments/*.rb")))
