@@ -190,6 +190,7 @@ next one.")
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-inf)
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-c C-s") 'inf-ruby)
+    (define-key map (kbd "C-c C-c") 'inf-ruby-console-auto)
     map))
 
 ;;;###autoload
