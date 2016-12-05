@@ -190,6 +190,22 @@ next one.")
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-inf)
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-c C-s") 'inf-ruby)
+    (easy-menu-define
+      inf-ruby-minor-mode-menu
+      map
+      "Inferior Ruby Minor Mode Menu"
+      '("Inf-Ruby"
+        ;; TODO: Add appropriate :active (or ENABLE) conditions.
+        ["Send definition" ruby-send-definition t]
+        ["Send last expression" ruby-send-last-sexp t]
+        ["Send block" ruby-send-block t]
+        ["Send region" ruby-send-region t]
+        "--"
+        ["Load file..." ruby-load-file t]
+        "--"
+        ["Start REPL" inf-ruby t]
+        ["Switch to REPL" ruby-switch-to-inf t]
+        ))
     map))
 
 ;;;###autoload
