@@ -118,7 +118,7 @@ Currently only affects `inf-ruby-console-rails'."
       "\\(^(byebug) *\\)"                 ; byebug
       "\\(^\\(irb([^)]+)"                 ; IRB default
       "\\([[0-9]+] \\)?[Pp]ry ?([^)]+)"   ; Pry
-      "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\(-?p?[0-9]+\\)?" ; RVM
+      "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\.[0-9]+\\.?[0-9]? ?\\([:-]?p?[0-9]+\\)? "; RVM
       "^rbx-head\\)")                     ; RVM continued
     "\\|")
    ;; Statement and nesting counters, common to the last four.
