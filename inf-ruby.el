@@ -553,6 +553,13 @@ Then switch to the process buffer."
     (widen)
     (ruby-send-region (point-min) (point-max))))
 
+(defun ruby-send-line ()
+  "Send the current line to the inferior Ruby process."
+  (interactive)
+  (save-restriction
+    (widen)
+    (ruby-send-region (point-at-bol) (point-at-eol))))
+
 (defun ruby-escape-single-quoted (str)
   "Escape single quotes, double quotes and newlines in STR."
   (replace-regexp-in-string "'" "\\\\'"
