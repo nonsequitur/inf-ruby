@@ -169,7 +169,6 @@ next one.")
   '(("SyntaxError: \\(?:compile error\n\\)?\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
     ("^\tfrom \\([^\(].*\\):\\([1-9][0-9]*\\)\\(:in `.*'\\)?$" 1 2)))
 
-;;;###autoload
 (defun inf-ruby-setup-keybindings ()
   "Hook up `inf-ruby-minor-mode' to each of `ruby-source-modes'."
   (warn "`inf-ruby-setup-keybindings' is deprecated, please don't use it anymore.")
