@@ -755,10 +755,10 @@ automatically."
   (or
    (let ((predicate (car (rassq type inf-ruby-console-patterns-alist))))
      (locate-dominating-file (read-directory-name "" nil nil t)
-                             (if (stringp predicate)
-                                 predicate
-                               (lambda (dir)
-                                 (let ((default-directory dir))
+                             (lambda (dir)
+                               (let ((default-directory dir))
+                                 (if (stringp predicate)
+                                     (file-expand-wildcards predicate)
                                    (funcall predicate))))))
    (error "No matching directory for %s console found"
           (capitalize (symbol-name type)))))
