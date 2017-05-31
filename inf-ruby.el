@@ -894,6 +894,7 @@ Gemfile, it should use the `gemspec' instruction."
         (file-exists-p "console")
         (file-exists-p "console.rb"))))
 
+;;;###autoload
 (defun inf-ruby-console-script (dir)
   "Run custom bin/console, console or console.rb in DIR."
   (interactive (list (inf-ruby-console-read-directory 'script)))
