@@ -708,6 +708,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 (defvar inf-ruby-console-patterns-alist
   '((".zeus.sock" . zeus)
     (inf-ruby-console-rails-p . rails)
+    (inf-ruby-console-script-p . script)
     ("*.gemspec" . gem)
     (inf-ruby-console-racksh-p . racksh)
     ("Gemfile" . default))
@@ -886,18 +887,33 @@ Gemfile, it should use the `gemspec' instruction."
   (interactive)
   (remove-hook 'compilation-filter-hook 'inf-ruby-auto-enter))
 
+(defun inf-ruby-console-script-p ()
+  (and (file-exists-p "Gemfile.lock")
+       (or
+        (file-exists-p "bin/console")
+        (file-exists-p "console")
+        (file-exists-p "console.rb"))))
+
+(defun inf-ruby-console-script (dir)
+  "Run custom bin/console, console or console.rb in DIR."
+  (interactive (list (inf-ruby-console-read-directory 'script)))
+  (let ((default-directory (file-name-as-directory dir)))
+    (cond
+     ((file-exists-p "bin/console")
+      (inf-ruby-console-run "bundle exec bin/console" "bin/console"))
+     ((file-exists-p "console.rb")
+      (inf-ruby-console-run "bundle exec ruby console.rb" "console.rb"))
+     ((file-exists-p "console")
+      (inf-ruby-console-run "bundle exec console" "console.rb")))))
+
 ;;;###autoload
 (defun inf-ruby-console-default (dir)
-  "Run custom console.rb, Pry, or bundle console, in DIR."
+  "Run Pry, or bundle console, in DIR."
   (interactive (list (inf-ruby-console-read-directory 'default)))
   (let ((default-directory (file-name-as-directory dir)))
     (unless (file-exists-p "Gemfile")
       (error "The directory must contain a Gemfile"))
     (cond
-     ((file-exists-p "console.rb")
-      (inf-ruby-console-run "bundle exec ruby console.rb" "console.rb"))
-     ((file-executable-p "console")
-      (inf-ruby-console-run "bundle exec console" "console.rb"))
      ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
       (inf-ruby-console-run "bundle exec pry" "pry"))
      (t
