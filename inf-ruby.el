@@ -814,11 +814,12 @@ automatically."
   (interactive (list (inf-ruby-console-read-directory 'hanami)))
   (let* ((default-directory (file-name-as-directory dir))
          (env (inf-ruby-console-hanami-env))
-         (with-bundler (file-exists-p "Gemfile")))
+         (with-bundler (file-exists-p "Gemfile"))
+         (process-environment (cons (format "HANAMI_ENV=%s" env)
+                                    process-environment)))
     (inf-ruby-console-run
      (concat (when with-bundler "bundle exec ")
-             "hanami console "
-             env)
+             "hanami console")
      "hanami")))
 
 (defun inf-ruby-console-hanami-env ()
