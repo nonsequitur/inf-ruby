@@ -104,7 +104,7 @@ Also see the description of `ielm-prompt-read-only'."
 If the value is not a string, ask the user to choose from the
 available ones.  Otherwise, just use the value.
 
-Currently only affects `inf-ruby-console-rails'."
+Currently only affects Rails and Hanami consoles."
   :type '(choice
           (const ask :tag "Ask the user")
           (string :tag "Environment name")))
@@ -708,6 +708,7 @@ keymaps to bind `inf-ruby-switch-from-compilation' to `С-x C-q'."
 (defvar inf-ruby-console-patterns-alist
   '((".zeus.sock" . zeus)
     (inf-ruby-console-rails-p . rails)
+    (inf-ruby-console-hanami-p . hanami)
     (inf-ruby-console-script-p . script)
     ("*.gemspec" . gem)
     (inf-ruby-console-racksh-p . racksh)
@@ -803,6 +804,31 @@ automatically."
     (if (null files)
         (error "No files in %s" (expand-file-name "config/environments/"))
       (mapcar #'file-name-base files))))
+
+(defun inf-ruby-console-hanami-p ()
+  (and (file-exists-p "config.ru")
+       (inf-ruby-file-contents-match "config.ru" "\\_<run Hanami.app\\_>")))
+
+(defun inf-ruby-console-hanami (dir)
+  "Run Hanami console in DIR."
+  (interactive (list (inf-ruby-console-read-directory 'hanami)))
+  (let* ((default-directory (file-name-as-directory dir))
+         (env (inf-ruby-console-hanami-env))
+         (with-bundler (file-exists-p "Gemfile")))
+    (inf-ruby-console-run
+     (concat (when with-bundler "bundle exec ")
+             "hanami console "
+             env)
+     "hanami")))
+
+(defun inf-ruby-console-hanami-env ()
+  (if (stringp inf-ruby-console-environment)
+      inf-ruby-console-environment
+    (let ((envs '("development" "test" "production")))
+      (completing-read "Hanami environment: "
+                       envs
+                       nil t
+                       nil nil (car (member "development" envs))))))
 
 ;;;###autoload
 (defun inf-ruby-console-gem (dir)
