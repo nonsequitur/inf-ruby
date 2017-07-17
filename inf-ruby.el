@@ -452,11 +452,18 @@ Must not contain ruby meta characters.")
            ;; Evaluation seems to have failed.
            ;; Try to extract the error string.
            (let* ((inhibit-field-text-motion t)
-                  (s (buffer-substring-no-properties (point) (line-end-position))))
+                  (s (buffer-substring-no-properties (point)
+                                                     (progn
+                                                       (re-search-forward inf-ruby-prompt-pattern)
+                                                       (re-search-backward inf-ruby-prompt-pattern)
+                                                       (backward-char 1)))))
              (while (string-match inf-ruby-prompt-pattern s)
                (setq s (replace-match "" t t s)))
              (error "%s" s)))
-       (buffer-substring-no-properties (point) (line-end-position))))))
+       (buffer-substring-no-properties (point) (progn
+                                                 (re-search-forward inf-ruby-prompt-pattern)
+                                                 (re-search-backward inf-ruby-prompt-pattern)
+                                                 (backward-char 1)))))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
