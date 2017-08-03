@@ -66,6 +66,8 @@ Additionally, consider adding
 to your init file to automatically switch from common Ruby compilation
 modes to interact with a debugger.
 
+### Custom Prompts
+
 If you wish to add other interpreter prompt patterns, see the description in
 the [wiki](https://github.com/nonsequitur/inf-ruby/wiki).
 
