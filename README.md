@@ -69,8 +69,7 @@ modes to interact with a debugger.
 ### Custom Prompts
 
 If you wish to add other interpreter prompt patterns, see the description in
-the [wiki](https://github.com/nonsequitur/inf-ruby/wiki).
-
+the [wiki](https://github.com/nonsequitur/inf-ruby/wiki/Adding-new-prompt-patterns).
 
 ### Emacs Prelude
 
