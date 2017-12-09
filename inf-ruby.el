@@ -884,7 +884,8 @@ Gemfile, it should use the `gemspec' instruction."
   "Check if MODE is a Ruby compilation mode."
   (member mode '(rspec-compilation-mode
                  ruby-compilation-mode
-                 projectile-rails-server-mode)))
+                 projectile-rails-server-mode
+                 minitest-compilation-mode)))
 
 ;;;###autoload
 (defun inf-ruby-auto-enter ()
