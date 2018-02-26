@@ -338,22 +338,40 @@ to that buffer. Otherwise create a new buffer."
   (setq impl (or impl "ruby"))
 
   (let ((command (cdr (assoc impl inf-ruby-implementations))))
-    (run-ruby-or-pop-to-buffer command impl
-                               (or (inf-ruby-buffer)
-                                   inf-ruby-buffer))))
+    (run-ruby command impl)))
 
 ;;;###autoload
-(defun run-ruby (command &optional name)
-  "Run an inferior Ruby process, input and output in a new buffer.
+(defun run-ruby (&optional command name)
+  "Run an inferior Ruby process, input and output in a buffer.
+
+If there is a process already running in a corresponding buffer,
+switch to that buffer. Otherwise create a new buffer.
 
 The consecutive buffer names will be:
 `*NAME*', `*NAME*<2>', `*NAME*<3>' and so on.
 
-NAME defaults to \"ruby\".
+COMMAND defaults to the default entry in
+`inf-ruby-implementations'. NAME defaults to \"ruby\".
 
 Runs the hooks `comint-mode-hook' and `inf-ruby-mode-hook'.
 
-\(Type \\[describe-mode] in the process buffer for the list of commands.)"
+Type \\[describe-mode] in the process buffer for the list of commands."
+  ;; This function is interactive and named like this for consistency
+  ;; with `run-python', `run-octave', `run-lisp' and so on.
+  ;; We're keeping both it and `inf-ruby' for backward compatibility.
+  (interactive)
+  (run-ruby-or-pop-to-buffer
+   (or command (cdr (assoc inf-ruby-default-implementation
+                           inf-ruby-implementations)))
+   (or name "ruby")
+   (or (inf-ruby-buffer)
+       inf-ruby-buffer)))
+
+(defun run-ruby-new (command &optional name)
+  "Create a new inferior Ruby process in a new buffer.
+
+COMMAND is the command to call. NAME will be used for the name of
+the buffer, defaults to \"ruby\"."
   (setq name (or name "ruby"))
 
   (let ((commandlist (split-string-and-unquote command))
@@ -380,7 +398,7 @@ Runs the hooks `comint-mode-hook' and `inf-ruby-mode-hook'.
 (defun run-ruby-or-pop-to-buffer (command &optional name buffer)
   (if (not (and buffer
                 (comint-check-proc buffer)))
-      (run-ruby command name)
+      (run-ruby-new command name)
     (pop-to-buffer buffer)
     (unless (and (string= inf-ruby-buffer-impl-name name)
                  (string= inf-ruby-buffer-command command))
