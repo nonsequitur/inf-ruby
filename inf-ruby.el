@@ -895,9 +895,10 @@ Gemfile, it should use the `gemspec' instruction."
                  (concat " -r " (file-name-sans-extension file)))
                files
                ""))))
-    (inf-ruby-console-run (concat base-command args
-                                  " -r irb/completion")
-                          "gem")))
+    (inf-ruby-console-run
+     (concat base-command args
+             " --prompt default --noreadline -r irb/completion")
+     "gem")))
 
 (defun inf-ruby-console-racksh-p ()
   (and (file-exists-p "Gemfile.lock")
