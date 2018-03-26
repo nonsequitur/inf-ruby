@@ -776,8 +776,7 @@ automatically."
     (funcall fun dir)))
 
 (defun inf-ruby-console-rails-p ()
-  (and (file-exists-p "Gemfile.lock")
-       (inf-ruby-file-contents-match "Gemfile.lock" "^ +railties ")
+  (and (file-exists-p "bin/rails")
        (file-exists-p "config/application.rb")
        (inf-ruby-file-contents-match "config/application.rb"
                                      "\\_<Rails::Application\\_>")))
