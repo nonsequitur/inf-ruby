@@ -829,7 +829,7 @@ automatically."
          (with-bundler (file-exists-p "Gemfile")))
     (inf-ruby-console-run
      (concat (when with-bundler "bundle exec ")
-             "rails console "
+             "rails console -e "
              env)
      "rails")))
 
