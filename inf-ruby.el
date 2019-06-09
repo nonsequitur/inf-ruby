@@ -272,7 +272,6 @@ The following commands are available:
     (set (make-local-variable 'smie-backward-token-function)
          #'inf-ruby-smie--backward-token))
   (add-hook 'comint-output-filter-functions 'inf-ruby-output-filter nil t)
-  (add-hook 'comint-output-filter-functions 'ansi-color-process-output nil t)
   (setq comint-get-old-input 'inf-ruby-get-old-input)
   (set (make-local-variable 'compilation-error-regexp-alist)
        inf-ruby-error-regexp-alist)
