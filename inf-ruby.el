@@ -335,7 +335,7 @@ to that buffer. Otherwise create a new buffer."
                          (completing-read "Ruby Implementation: "
                                           (mapc #'car inf-ruby-implementations))
                        inf-ruby-default-implementation)))
-  (setq impl (or impl "ruby"))
+  (setq impl (or impl inf-ruby-default-implementation))
 
   (let ((command (cdr (assoc impl inf-ruby-implementations))))
     (run-ruby command impl)))
@@ -363,7 +363,7 @@ Type \\[describe-mode] in the process buffer for the list of commands."
   (run-ruby-or-pop-to-buffer
    (or command (cdr (assoc inf-ruby-default-implementation
                            inf-ruby-implementations)))
-   (or name "ruby")
+   (or name inf-ruby-default-implementation)
    (or (inf-ruby-buffer)
        inf-ruby-buffer)))
 
@@ -372,7 +372,7 @@ Type \\[describe-mode] in the process buffer for the list of commands."
 
 COMMAND is the command to call. NAME will be used for the name of
 the buffer, defaults to \"ruby\"."
-  (setq name (or name "ruby"))
+  (setq name (or name inf-ruby-default-implementation))
 
   (let ((commandlist (split-string-and-unquote command))
         (buffer (current-buffer))
