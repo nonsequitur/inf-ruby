@@ -345,7 +345,8 @@ If there is a Ruby process running in an existing buffer, switch
 to that buffer. Otherwise create a new buffer."
   (interactive (list (if current-prefix-arg
                          (completing-read "Ruby Implementation: "
-                                          (mapc #'car inf-ruby-implementations))
+                                          inf-ruby-implementations nil nil
+                                          inf-ruby-default-implementation)
                        inf-ruby-default-implementation)))
   (setq impl (or impl inf-ruby-default-implementation))
 
