@@ -224,6 +224,9 @@ The following commands are available:
 (defvar inf-ruby-buffer-command nil "The command used to run Ruby shell")
 (make-variable-buffer-local 'inf-ruby-buffer-command)
 
+(defvar inf-ruby-buffer-command-list nil "The command list used to run Ruby shell")
+(make-variable-buffer-local 'inf-ruby-buffer-command-list)
+
 (defvar inf-ruby-buffer-impl-name nil "The name of the Ruby shell")
 (make-variable-buffer-local 'inf-ruby-buffer-impl-name)
 
@@ -387,7 +390,7 @@ COMMAND is the command to call. NAME will be used for the name of
 the buffer, defaults to \"ruby\"."
   (setq name (or name inf-ruby-default-implementation))
 
-  (let ((commandlist (split-string-and-unquote command))
+  (let ((command-list (split-string-and-unquote command))
         (buffer (current-buffer))
         (process-environment process-environment))
     ;; http://debbugs.gnu.org/15775
@@ -395,12 +398,13 @@ the buffer, defaults to \"ruby\"."
     (set-buffer (apply 'make-comint-in-buffer
                        name
                        (generate-new-buffer-name (format "*%s*" name))
-                       (car commandlist)
-                       nil (cdr commandlist)))
+                       (car command-list)
+                       nil (cdr command-list)))
     (inf-ruby-mode)
     (ruby-remember-ruby-buffer buffer)
     (push (current-buffer) inf-ruby-buffers)
     (setq inf-ruby-buffer-impl-name name
+          inf-ruby-buffer-command-list command-list
           inf-ruby-buffer-command command))
 
   (unless (and inf-ruby-buffer (comint-check-proc inf-ruby-buffer))
@@ -408,17 +412,22 @@ the buffer, defaults to \"ruby\"."
 
   (pop-to-buffer (current-buffer)))
 
+(defun inf-ruby-buffer-pop (buffer)
+  "Pop to inf-ruby buffer and ensure the process is running."
+  (pop-to-buffer
+   (if (comint-check-proc buffer)
+       buffer
+     (let ((command-list (buffer-local-value 'inf-ruby-buffer-command-list
+                                             buffer)))
+       (apply 'make-comint-in-buffer
+              (buffer-local-value 'inf-ruby-buffer-impl-name buffer)
+              buffer (car command-list)
+              nil (cdr command-list))))))
+
 (defun run-ruby-or-pop-to-buffer (command &optional name buffer)
-  (if (not (and buffer
-                (comint-check-proc buffer)))
-      (run-ruby-new command name)
-    (pop-to-buffer buffer)
-    (unless (and (string= inf-ruby-buffer-impl-name name)
-                 (string= inf-ruby-buffer-command command))
-      (error (concat "Found inf-ruby buffer, but it was created using "
-                     "a different NAME-COMMAND combination: %s, `%s'")
-             inf-ruby-buffer-impl-name
-             inf-ruby-buffer-command))))
+  (if buffer
+      (inf-ruby-buffer-pop buffer)
+    (run-ruby-new command name)))
 
 (defun inf-ruby-proc ()
   "Return the inferior Ruby process for the current buffer or project.
@@ -526,16 +535,14 @@ Must not contain ruby meta characters.")
   "Switch to the ruby process buffer.
 With argument, positions cursor at end of buffer."
   (interactive "P")
-  (let ((buffer (current-buffer))
-        (inf-ruby-buffer* (or (inf-ruby-buffer) inf-ruby-buffer)))
-    (if inf-ruby-buffer*
-        (progn
-          (pop-to-buffer inf-ruby-buffer*)
-          (ruby-remember-ruby-buffer buffer))
-      (error "No current process buffer, see variable inf-ruby-buffers")))
-  (cond (eob-p
-         (push-mark)
-         (goto-char (point-max)))))
+  (let ((buffer (current-buffer)))
+    (inf-ruby-buffer-pop
+     (or (inf-ruby-buffer) inf-ruby-buffer
+         (error "No current process buffer, see variable inf-ruby-buffers")))
+    (ruby-remember-ruby-buffer buffer))
+  (when eob-p
+    (push-mark)
+    (goto-char (point-max))))
 
 (defun ruby-switch-to-last-ruby-buffer ()
   "Switch back to the last Ruby buffer."
