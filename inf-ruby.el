@@ -732,7 +732,7 @@ Otherwise, just toggle read-only status."
         (set (make-local-variable 'compilation-arguments) arguments)
         (when proc
           (set-process-filter proc filter)))
-    (toggle-read-only)))
+    (read-only-mode 'toggle)))
 
 ;;;###autoload
 (defun inf-ruby-switch-setup ()
