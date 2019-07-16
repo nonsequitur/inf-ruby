@@ -309,10 +309,22 @@ The following commands are available:
 
 (defun inf-ruby-buffer ()
   "Return inf-ruby buffer for the current buffer or project."
+  (setq inf-ruby-buffers (cl-delete-if-not #'buffer-live-p inf-ruby-buffers))
+  (when (and inf-ruby-buffer (not (buffer-live-p inf-ruby-buffer)))
+    (setq inf-ruby-buffer nil))
   (let ((current-dir (locate-dominating-file default-directory
                                              #'inf-ruby-console-match)))
-    (and current-dir
-         (inf-ruby-buffer-in-directory current-dir))))
+    (or (and current-dir
+             (inf-ruby-buffer-in-directory current-dir))
+        (inf-ruby-buffer-implementation))))
+
+(defun inf-ruby-buffer-implementation (&optional impl)
+  "Find a buffer running this implementation."
+  (cl-find (or impl inf-ruby-default-implementation)
+           inf-ruby-buffers :test #'string=
+           :key (lambda (buffer)
+                  (and (buffer-live-p buffer)
+                       (buffer-local-value 'inf-ruby-buffer-impl-name buffer)))))
 
 (defun inf-ruby-buffer-in-directory (dir)
   (setq dir (expand-file-name dir))
