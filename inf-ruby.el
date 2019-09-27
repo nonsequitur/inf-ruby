@@ -460,7 +460,8 @@ Must not contain ruby meta characters.")
   "Print the result of the last evaluation in the current buffer."
   (let ((proc (inf-ruby-proc)))
     (insert
-     (with-current-buffer (inf-ruby-buffer)
+     (with-current-buffer (or (inf-ruby-buffer)
+                              inf-ruby-buffer)
        (while (not (and comint-last-prompt
                         (goto-char (car comint-last-prompt))
                         (looking-at inf-ruby-first-prompt-pattern)))
