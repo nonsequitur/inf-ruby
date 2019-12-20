@@ -83,12 +83,18 @@ Also see the description of `ielm-prompt-read-only'."
   :group 'inf-ruby)
 
 (defcustom inf-ruby-implementations
-  '(("ruby"     . "irb --legacy --prompt default --noreadline -r irb/completion")
+  '((if (version-list-<
+         (version-to-list (cadr (split-string (shell-command-to-string "irb -v") " ")))
+         (version-to-list "1.2.0"))
+        '("ruby"     . "irb --prompt default --noreadline -r irb/completion")
+      '("ruby"     . "irb --legacy --prompt default --noreadline -r irb/completion"))
+
     ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("yarv"     . "irb1.9 -r irb/completion")
     ("macruby"  . "macirb -r irb/completion")
     ("pry"      . "pry"))
+
   "An alist of ruby implementations to irb executable names."
   :type '(repeat (cons string string))
   :group 'inf-ruby)
