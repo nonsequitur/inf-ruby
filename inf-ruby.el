@@ -83,7 +83,7 @@ Also see the description of `ielm-prompt-read-only'."
   :group 'inf-ruby)
 
 (defcustom inf-ruby-implementations
-  '(("ruby"     . "irb --prompt default --noreadline -r irb/completion")
+  '(("ruby"     . "irb --legacy --prompt default --noreadline -r irb/completion")
     ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("yarv"     . "irb1.9 -r irb/completion")
