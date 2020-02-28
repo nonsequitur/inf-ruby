@@ -166,7 +166,7 @@ next one.")
 (make-variable-buffer-local 'inf-ruby-last-prompt)
 
 (defconst inf-ruby-error-regexp-alist
-  '(("SyntaxError: \\(?:compile error\n\\)?\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
+  '(("^SyntaxError: \\(?:compile error\n\\)?\\([^\(].*\\):\\([1-9][0-9]*\\):" 1 2)
     ("^\tfrom \\([^\(].*\\):\\([1-9][0-9]*\\)\\(:in `.*'\\)?$" 1 2)))
 
 ;;;###autoload
