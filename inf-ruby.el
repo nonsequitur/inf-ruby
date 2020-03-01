@@ -83,13 +83,15 @@ Also see the description of `ielm-prompt-read-only'."
   :group 'inf-ruby)
 
 (defcustom inf-ruby-implementations
-  '(("ruby"     . "irb --prompt default --noreadline -r irb/completion")
+  '(("ruby"     . inf-ruby--irb-command)
     ("jruby"    . "jruby -S irb --prompt default --noreadline -r irb/completion")
     ("rubinius" . "rbx -r irb/completion")
     ("yarv"     . "irb1.9 -r irb/completion")
     ("macruby"  . "macirb -r irb/completion")
     ("pry"      . "pry"))
-  "An alist of ruby implementations to irb executable names."
+  "An alist mapping Ruby implementations to Irb commands.
+CDR of each entry must be either a string or a function that
+returns a string."
   :type '(repeat (cons string string))
   :group 'inf-ruby)
 
@@ -98,6 +100,13 @@ Also see the description of `ielm-prompt-read-only'."
   :type `(choice ,@(mapcar (lambda (item) (list 'const (car item)))
                            inf-ruby-implementations))
   :group 'inf-ruby)
+
+(defun inf-ruby--irb-command ()
+  (let ((command "irb --prompt default --noreadline -r irb/completion")
+        (version (nth 1 (split-string (shell-command-to-string "irb -v") "[ (]"))))
+    (when (version<= "1.2.0" version)
+      (setq command (concat command " --nomultiline")))
+    command))
 
 (defcustom inf-ruby-console-environment 'ask
   "Envronment to use for the `inf-ruby-console-*' commands.
@@ -338,6 +347,8 @@ to that buffer. Otherwise create a new buffer."
   (setq impl (or impl "ruby"))
 
   (let ((command (cdr (assoc impl inf-ruby-implementations))))
+    (when (functionp command)
+      (setq command (funcall command)))
     (run-ruby command impl)))
 
 ;;;###autoload
