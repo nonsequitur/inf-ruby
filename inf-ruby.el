@@ -102,11 +102,15 @@ returns a string."
   :group 'inf-ruby)
 
 (defun inf-ruby--irb-command ()
-  (let ((command "irb --prompt default --noreadline -r irb/completion")
-        (version (nth 1 (split-string (shell-command-to-string "irb -v") "[ (]"))))
-    (when (version<= "1.2.0" version)
+  (let ((command "irb --prompt default --noreadline -r irb/completion"))
+    (when (inf-ruby--irb-needs-nomultiline-p)
       (setq command (concat command " --nomultiline")))
     command))
+
+(defun inf-ruby--irb-needs-nomultiline-p ()
+  (let ((version (nth 1 (split-string
+                         (shell-command-to-string "irb -v") "[ (]"))))
+    (version<= "1.2.0" version)))
 
 (defcustom inf-ruby-console-environment 'ask
   "Envronment to use for the `inf-ruby-console-*' commands.
@@ -929,6 +933,8 @@ Gemfile, it should use the `gemspec' instruction."
                  (concat " -r " (file-name-sans-extension file)))
                files
                ""))))
+    (when (inf-ruby--irb-needs-nomultiline-p)
+      (setq base-command (concat base-command " --nomultiline")))
     (inf-ruby-console-run
      (concat base-command args
              " --prompt default --noreadline -r irb/completion")
