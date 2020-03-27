@@ -351,8 +351,6 @@ to that buffer. Otherwise create a new buffer."
   (setq impl (or impl "ruby"))
 
   (let ((command (cdr (assoc impl inf-ruby-implementations))))
-    (when (functionp command)
-      (setq command (funcall command)))
     (run-ruby command impl)))
 
 ;;;###autoload
@@ -376,8 +374,13 @@ Type \\[describe-mode] in the process buffer for the list of commands."
   ;; We're keeping both it and `inf-ruby' for backward compatibility.
   (interactive)
   (run-ruby-or-pop-to-buffer
-   (or command (cdr (assoc inf-ruby-default-implementation
-                           inf-ruby-implementations)))
+   (let ((command
+          (or command
+              (cdr (assoc inf-ruby-default-implementation
+                          inf-ruby-implementations)))))
+     (if (functionp command)
+         (funcall command)
+       command))
    (or name "ruby")
    (or (inf-ruby-buffer)
        inf-ruby-buffer)))
