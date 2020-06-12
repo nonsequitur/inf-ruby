@@ -108,9 +108,11 @@ returns a string."
     command))
 
 (defun inf-ruby--irb-needs-nomultiline-p ()
-  (let ((version (nth 1 (split-string
-                         (shell-command-to-string "irb -v") "[ (]"))))
-    (version<= "1.2.0" version)))
+  (let* ((output (shell-command-to-string "irb -v"))
+         (fields (split-string output "[ (]")))
+    (if (equal (car fields) "irb")
+        (version<= "1.2.0" (nth 1 fields))
+      (error "Irb version unknown: %s" output))))
 
 (defcustom inf-ruby-console-environment 'ask
   "Envronment to use for the `inf-ruby-console-*' commands.
