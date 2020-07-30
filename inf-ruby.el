@@ -861,7 +861,11 @@ automatically."
     (inf-ruby-console-run
      (concat (when with-bundler "bundle exec ")
              "rails console -e "
-             env)
+             env
+             ;; Note: this only has effect in Rails < 5.0 or >= 5.1.4
+             ;; https://github.com/rails/rails/pull/29010
+             (when (inf-ruby--irb-needs-nomultiline-p)
+               " -- --nomultiline"))
      "rails")))
 
 (defun inf-ruby-console-rails-env ()
