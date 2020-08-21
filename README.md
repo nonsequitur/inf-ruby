@@ -126,7 +126,7 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 IRB.conf[:USE_READLINE] = false if ENV['INSIDE_EMACS']
 ```
 
-* If your Ruby version is 2.7+ and there is a weird char instead of prompt, or you see a reline related error [([example](https://github.com/ruby/irb/issues/43#issuecomment-589593889)), try adding the following to your `~/.irbrc` as well:
+* If your Ruby version is 2.7+ and there is a triangle instead of prompt, or you see a reline related error ([example](https://github.com/ruby/irb/issues/43#issuecomment-589593889)), try adding the following to your `~/.irbrc` as well:
 
 ```rb
 IRB.conf[:USE_MULTILINE] = false if ENV['INSIDE_EMACS']
