@@ -102,9 +102,10 @@ returns a string."
   :group 'inf-ruby)
 
 (defun inf-ruby--irb-command ()
-  (let ((command "irb --prompt default --noreadline -r irb/completion"))
-    (when (inf-ruby--irb-needs-nomultiline-p)
-      (setq command (concat command " --nomultiline")))
+  (let ((command "irb --prompt default -r irb/completion"))
+    (if (inf-ruby--irb-needs-nomultiline-p)
+        (setq command (concat command " --nomultiline"))
+      (setq command (concat command "  --noreadline")))
     command))
 
 (defun inf-ruby--irb-needs-nomultiline-p ()
