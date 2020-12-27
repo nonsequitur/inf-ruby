@@ -509,23 +509,25 @@ Must not contain ruby meta characters.")
   (interactive)
   (save-excursion
     (let ((orig-start (point))
-	  (adjust-lineno 0)
-	  prefix suffix defun-start)
+          (adjust-lineno 0)
+          prefix suffix defun-start)
       (save-excursion
-	(end-of-line)
-	(ruby-beginning-of-defun)
-	(setq defun-start (point))
-	(unless (ruby-block-contains-point orig-start)
-	  (error "point is not within a definition"))
-	(while (and (ignore-errors (backward-up-list) t)
-		    (looking-at "\\s-*\\(class\\|module\\)\\s-"))
-	  (let ((line (buffer-substring-no-properties (line-beginning-position)(1+ (line-end-position)))))
-	    (if prefix
-		(setq prefix (concat line prefix)
-		      suffix (concat suffix "end\n"))
-	      (setq prefix line
-		    suffix "end\n"))
-	    (setq adjust-lineno (1- adjust-lineno)))))
+        (end-of-line)
+        (ruby-beginning-of-defun)
+        (setq defun-start (point))
+        (unless (ruby-block-contains-point orig-start)
+          (error "Point is not within a definition"))
+        (while (and (ignore-errors (backward-up-list) t)
+                    (looking-at "\\s-*\\(class\\|module\\)\\s-"))
+          (let ((line (buffer-substring-no-properties
+                       (line-beginning-position)
+                       (1+ (line-end-position)))))
+            (if prefix
+                (setq prefix (concat line prefix)
+                      suffix (concat suffix "end\n"))
+              (setq prefix line
+                    suffix "end\n"))
+            (setq adjust-lineno (1- adjust-lineno)))))
       (end-of-defun)
       (ruby-send-region defun-start (point) nil prefix suffix adjust-lineno))))
 
