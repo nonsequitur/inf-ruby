@@ -450,7 +450,7 @@ Must not contain ruby meta characters.")
 
 (defconst ruby-eval-separator "")
 
-(defun ruby-send-region (start end &optional print)
+(defun ruby-send-region (start end &optional print prefix suffix line-adjust)
   "Send the current region to the inferior Ruby process."
   (interactive "r\nP")
   (let (term (file (or buffer-file-name (buffer-name))) line)
@@ -470,10 +470,16 @@ Must not contain ruby meta characters.")
         (goto-char m)
         (insert ruby-eval-separator "\n")
         (set-marker m (point))))
+    (if line-adjust
+	(setq line (+ line line-adjust)))
     (comint-send-string (inf-ruby-proc) (format "eval <<'%s', %s, %S, %d\n"
                                                 term inf-ruby-eval-binding
                                                 file line))
+    (if prefix
+	(comint-send-string (inf-ruby-proc) prefix))
     (comint-send-region (inf-ruby-proc) start end)
+    (if suffix
+	(comint-send-string (inf-ruby-proc) suffix))
     (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))
     (when print (ruby-print-result))))
 
@@ -502,10 +508,26 @@ Must not contain ruby meta characters.")
   "Send the current definition to the inferior Ruby process."
   (interactive)
   (save-excursion
-    (end-of-defun)
-    (let ((end (point)))
-      (ruby-beginning-of-defun)
-      (ruby-send-region (point) end))))
+    (let ((orig-start (point))
+	  (adjust-lineno 0)
+	  prefix suffix defun-start)
+      (save-excursion
+	(end-of-line)
+	(ruby-beginning-of-defun)
+	(setq defun-start (point))
+	(unless (ruby-block-contains-point orig-start)
+	  (error "point is not within a definition"))
+	(while (and (ignore-errors (backward-up-list) t)
+		    (looking-at "\\s-*\\(class\\|module\\)\\s-"))
+	  (let ((line (buffer-substring-no-properties (line-beginning-position)(1+ (line-end-position)))))
+	    (if prefix
+		(setq prefix (concat line prefix)
+		      suffix (concat suffix "end\n"))
+	      (setq prefix line
+		    suffix "end\n"))
+	    (setq adjust-lineno (1- adjust-lineno)))))
+      (end-of-defun)
+      (ruby-send-region defun-start (point) nil prefix suffix adjust-lineno))))
 
 (defun ruby-send-last-sexp (&optional print)
   "Send the previous sexp to the inferior Ruby process."
