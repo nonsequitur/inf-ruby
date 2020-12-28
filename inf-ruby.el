@@ -11,6 +11,7 @@
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
 ;; Version: 2.5.2
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -788,7 +789,7 @@ Otherwise, just toggle read-only status."
         (set (make-local-variable 'compilation-error-regexp-alist) errors)
         (when proc
           (set-process-filter proc filter)))
-    (toggle-read-only)))
+    (read-only-mode)))
 
 ;;;###autoload
 (defun inf-ruby-switch-setup ()
