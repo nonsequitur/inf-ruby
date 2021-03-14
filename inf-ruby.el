@@ -126,6 +126,12 @@ Currently only affects Rails and Hanami consoles."
           (const ask :tag "Ask the user")
           (string :tag "Environment name")))
 
+(defcustom inf-ruby-reuse-older-buffers t
+  "When non-nil, `run-ruby-new' will try to reuse the buffer left
+over by a previous Ruby process, as long as it was launched in
+the same directory and used the same base name."
+  :type 'boolean)
+
 (defconst inf-ruby-prompt-format
   (concat
    (mapconcat
@@ -331,13 +337,15 @@ The following commands are available:
     (and current-dir
          (inf-ruby-buffer-in-directory current-dir))))
 
-(defun inf-ruby-buffer-in-directory (dir)
+(defun inf-ruby-buffer-in-directory (dir &optional impl-name)
   (setq dir (expand-file-name dir))
   (catch 'buffer
     (dolist (buffer inf-ruby-buffers)
       (when (buffer-live-p buffer)
         (with-current-buffer buffer
-          (when (string= (expand-file-name default-directory) dir)
+          (when (and (string= (expand-file-name default-directory) dir)
+                     (or (not impl-name)
+                         (equal impl-name inf-ruby-buffer-impl-name)))
             (throw 'buffer buffer)))))))
 
 ;;;###autoload
@@ -390,7 +398,7 @@ Type \\[describe-mode] in the process buffer for the list of commands."
        inf-ruby-buffer)))
 
 (defun run-ruby-new (command &optional name)
-  "Create a new inferior Ruby process in a new buffer.
+  "Create a new inferior Ruby process in a new or existing buffer.
 
 COMMAND is the command to call. NAME will be used for the name of
 the buffer, defaults to \"ruby\"."
@@ -403,7 +411,7 @@ the buffer, defaults to \"ruby\"."
     (setenv "PAGER" (executable-find "cat"))
     (set-buffer (apply 'make-comint-in-buffer
                        name
-                       (generate-new-buffer-name (format "*%s*" name))
+                       (inf-ruby-choose-buffer-name name)
                        (car commandlist)
                        nil (cdr commandlist)))
     (inf-ruby-mode)
@@ -416,6 +424,15 @@ the buffer, defaults to \"ruby\"."
     (setq inf-ruby-buffer (current-buffer)))
 
   (pop-to-buffer (current-buffer)))
+
+(defun inf-ruby-choose-buffer-name (name)
+  "Return the name of a suitable buffer or generate a unique one."
+  (let ((buffer (and inf-ruby-reuse-older-buffers
+                     (inf-ruby-buffer-in-directory default-directory
+                                                   name))))
+    (if buffer
+        (buffer-name buffer)
+      (generate-new-buffer-name (format "*%s*" name)))))
 
 (defun run-ruby-or-pop-to-buffer (command &optional name buffer)
   (if (not (and buffer
