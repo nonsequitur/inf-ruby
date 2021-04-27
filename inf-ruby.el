@@ -109,8 +109,11 @@ returns a string."
       (setq command (concat command "  --noreadline")))
     command))
 
-(defun inf-ruby--irb-needs-nomultiline-p ()
-  (let* ((output (shell-command-to-string "irb -v"))
+(defun inf-ruby--irb-needs-nomultiline-p (&optional with-bundler)
+  (let* ((output (shell-command-to-string
+                  (concat
+                   (when with-bundler "bundle exec ")
+                   "irb -v")))
          (fields (split-string output "[ (]")))
     (if (equal (car fields) "irb")
         (version<= "1.2.0" (nth 1 fields))
@@ -960,8 +963,9 @@ Gemfile, it should use the `gemspec' instruction."
   (interactive (list (inf-ruby-console-read-directory 'gem)))
   (let* ((default-directory (file-name-as-directory dir))
          (gemspec (car (file-expand-wildcards "*.gemspec")))
+         (with-bundler (file-exists-p "Gemfile"))
          (base-command
-          (if (file-exists-p "Gemfile")
+          (if with-bundler
               (if (inf-ruby-file-contents-match gemspec "\\$LOAD_PATH")
                   "bundle exec irb"
                 "bundle exec irb -I lib")
@@ -987,7 +991,7 @@ Gemfile, it should use the `gemspec' instruction."
                  (concat " -r " (file-name-sans-extension file)))
                files
                ""))))
-    (when (inf-ruby--irb-needs-nomultiline-p)
+    (when (inf-ruby--irb-needs-nomultiline-p with-bundler)
       (setq base-command (concat base-command " --nomultiline")))
     (inf-ruby-console-run
      (concat base-command args
