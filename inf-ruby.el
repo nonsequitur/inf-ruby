@@ -419,7 +419,8 @@ the buffer, defaults to \"ruby\"."
                        nil (cdr commandlist)))
     (inf-ruby-mode)
     (ruby-remember-ruby-buffer buffer)
-    (push (current-buffer) inf-ruby-buffers)
+    (unless (memq (current-buffer) inf-ruby-buffers)
+      (push (current-buffer) inf-ruby-buffers))
     (setq inf-ruby-buffer-impl-name name
           inf-ruby-buffer-command command))
 
