@@ -559,6 +559,26 @@ Must not contain ruby meta characters.")
   (ruby-send-region (save-excursion (ruby-backward-sexp) (point)) (point))
   (when print (ruby-print-result)))
 
+(defun ruby-send-last-stmt (&optional print)
+  "Send the preceding statement to the inferior Ruby process."
+  (interactive "P")
+  (let (beg)
+    (save-excursion
+      (cond
+       ((and (derived-mode-p 'ruby-mode)
+             (bound-and-true-p smie-rules-function))
+        (or (member (nth 2 (smie-backward-sexp ";")) '(";" "#" nil))
+            (error "Preceding statement not found"))
+        (setq beg (point)))
+       (t ; enh-ruby-mode?
+        (back-to-indentation)
+        (while (and (eq (char-after) ?.)
+                    (zerop (forward-line -1)))
+          (back-to-indentation))
+        (setq beg (point)))))
+    (ruby-send-region beg (point)))
+  (when print (ruby-print-result)))
+
 (defun ruby-send-block (&optional print)
   "Send the current block to the inferior Ruby process."
   (interactive "P")
