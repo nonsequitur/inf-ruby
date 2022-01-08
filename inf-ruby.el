@@ -165,7 +165,7 @@ graphical char in all other prompts.")
 (defvar inf-ruby-mode-map
   (let ((map (copy-keymap comint-mode-map)))
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
-    (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
+    (define-key map (kbd "C-x C-e") 'ruby-send-last-stmt)
     (define-key map (kbd "TAB") 'completion-at-point)
     (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-last-ruby-buffer)
@@ -206,7 +206,7 @@ next one.")
 (defvar inf-ruby-minor-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-x") 'ruby-send-definition)
-    (define-key map (kbd "C-x C-e") 'ruby-send-last-sexp)
+    (define-key map (kbd "C-x C-e") 'ruby-send-last-stmt)
     (define-key map (kbd "C-c C-b") 'ruby-send-block)
     (define-key map (kbd "C-c M-b") 'ruby-send-block-and-go)
     (define-key map (kbd "C-c C-x") 'ruby-send-definition)
@@ -223,7 +223,7 @@ next one.")
       '("Inf-Ruby"
         ;; TODO: Add appropriate :active (or ENABLE) conditions.
         ["Send definition" ruby-send-definition t]
-        ["Send last expression" ruby-send-last-sexp t]
+        ["Send last statement" ruby-send-last-stmt t]
         ["Send block" ruby-send-block t]
         ["Send region" ruby-send-region t]
         "--"
