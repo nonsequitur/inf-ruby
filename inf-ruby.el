@@ -507,7 +507,10 @@ Must not contain ruby meta characters.")
     (when print (ruby-print-result))))
 
 (defface inf-ruby-result-overlay-face
-  '((((class color) (background light)) :background "black" :box (:line-width -1 :color "yellow")))
+  '((((class color) (background light))
+     :background "grey90" :box (:line-width -1 :color "yellow"))
+    (((class color) (background dark))
+     :background "grey10" :box (:line-width -1 :color "black")))
   "Face used to display evaluation results at the end of line.")
 
 ;; Overlay
