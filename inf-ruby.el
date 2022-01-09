@@ -625,7 +625,6 @@ This function also removes itself from `pre-command-hook'."
   (inf-ruby--make-result-overlay (format "%S" value) (point) 'command)
   value)
 
-
 (defun ruby-print-result ()
   "Print the result of the last evaluation in the current buffer."
   (let ((proc (inf-ruby-proc)))
