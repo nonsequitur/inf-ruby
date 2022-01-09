@@ -503,7 +503,7 @@ Must not contain ruby meta characters.")
     (if suffix
 	(comint-send-string (inf-ruby-proc) suffix))
     (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))
-    (when print (ruby-print-result))))
+    (ruby-print-result print)))
 
 (defface inf-ruby-result-overlay-face
   '((((class color) (background light))
@@ -625,26 +625,32 @@ This function also removes itself from `pre-command-hook'."
   (inf-ruby--make-result-overlay (format "%S" value) (point) 'command)
   value)
 
-(defun ruby-print-result ()
+(defun ruby-print-result (&optional insert)
   "Print the result of the last evaluation in the current buffer."
+  (let ((proc (inf-ruby-proc))
+        (result (ruby-print-result-value)))
+    (if insert
+        (insert result)
+      (inf-ruby--eval-overlay result))))
+
+(defun ruby-print-result-value ()
   (let ((proc (inf-ruby-proc)))
-    (inf-ruby--eval-overlay
-     (with-current-buffer (or (inf-ruby-buffer)
-                              inf-ruby-buffer)
-       (while (not (and comint-last-prompt
-                        (goto-char (car comint-last-prompt))
-                        (looking-at inf-ruby-first-prompt-pattern)))
-         (accept-process-output proc))
-       (re-search-backward inf-ruby-prompt-pattern)
-       (or (re-search-forward " => " (car comint-last-prompt) t)
-           ;; Evaluation seems to have failed.
-           ;; Try to extract the error string.
-           (let* ((inhibit-field-text-motion t)
-                  (s (buffer-substring-no-properties (point) (line-end-position))))
-             (while (string-match inf-ruby-prompt-pattern s)
-               (setq s (replace-match "" t t s)))
-             (error "%s" s)))
-       (buffer-substring-no-properties (point) (line-end-position))))))
+    (with-current-buffer (or (inf-ruby-buffer)
+                             inf-ruby-buffer)
+      (while (not (and comint-last-prompt
+                       (goto-char (car comint-last-prompt))
+                       (looking-at inf-ruby-first-prompt-pattern)))
+        (accept-process-output proc))
+      (re-search-backward inf-ruby-prompt-pattern)
+      (or (re-search-forward " => " (car comint-last-prompt) t)
+          ;; Evaluation seems to have failed.
+          ;; Try to extract the error string.
+          (let* ((inhibit-field-text-motion t)
+                 (s (buffer-substring-no-properties (point) (line-end-position))))
+            (while (string-match inf-ruby-prompt-pattern s)
+              (setq s (replace-match "" t t s)))
+            (error "%s" s)))
+      (buffer-substring-no-properties (point) (line-end-position)))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
@@ -677,7 +683,7 @@ This function also removes itself from `pre-command-hook'."
   "Send the previous sexp to the inferior Ruby process."
   (interactive "P")
   (ruby-send-region (save-excursion (ruby-backward-sexp) (point)) (point))
-  (when print (ruby-print-result)))
+  (ruby-print-result print))
 
 (defun ruby-send-last-stmt (&optional print)
   "Send the preceding statement to the inferior Ruby process."
@@ -697,7 +703,7 @@ This function also removes itself from `pre-command-hook'."
           (back-to-indentation))
         (setq beg (point)))))
     (ruby-send-region beg (point)))
-  (when print (ruby-print-result)))
+  (ruby-print-result print))
 
 (defun ruby-send-block (&optional print)
   "Send the current block to the inferior Ruby process."
@@ -708,7 +714,7 @@ This function also removes itself from `pre-command-hook'."
     (let ((end (point)))
       (ruby-beginning-of-block)
       (ruby-send-region (point) end)))
-  (when print (ruby-print-result)))
+  (ruby-print-result print))
 
 (defvar ruby-last-ruby-buffer nil
   "The last buffer we switched to `inf-ruby' from.")
