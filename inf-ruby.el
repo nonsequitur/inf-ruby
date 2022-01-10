@@ -622,7 +622,7 @@ This function also removes itself from `pre-command-hook'."
 
 (defun inf-ruby--eval-overlay (value)
   "Make overlay for VALUE at POINT."
-  (inf-ruby--make-result-overlay (format "%S" value) (point) 'command)
+  (inf-ruby--make-result-overlay value (point) 'command)
   value)
 
 (defun ruby-print-result (&optional insert)
