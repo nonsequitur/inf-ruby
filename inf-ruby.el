@@ -165,6 +165,7 @@ graphical char in all other prompts.")
 (defvar inf-ruby-mode-map
   (let ((map (copy-keymap comint-mode-map)))
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
+    (define-key map (kbd "C-c C-k") 'ruby-load-current-file)
     (define-key map (kbd "C-x C-e") 'ruby-send-last-stmt)
     (define-key map (kbd "TAB") 'completion-at-point)
     (define-key map (kbd "C-x C-q") 'inf-ruby-maybe-switch-to-compilation)
@@ -215,6 +216,7 @@ next one.")
     (define-key map (kbd "C-c M-r") 'ruby-send-region-and-go)
     (define-key map (kbd "C-c C-z") 'ruby-switch-to-inf)
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
+    (define-key map (kbd "C-c C-k") 'ruby-load-current-file)
     (define-key map (kbd "C-c C-s") 'inf-ruby)
     (easy-menu-define
       inf-ruby-minor-mode-menu
@@ -777,6 +779,11 @@ Then switch to the process buffer."
   (comint-send-string (inf-ruby-proc) (concat "(load \""
                                               file-name
                                               "\"\)\n")))
+
+(defun ruby-load-current-file ()
+  "Load the current ruby file into the inferior Ruby process."
+  (interactive)
+  (ruby-load-file (buffer-name)))
 
 (defun ruby-send-buffer ()
   "Send the current buffer to the inferior Ruby process."
