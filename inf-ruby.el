@@ -783,7 +783,7 @@ Then switch to the process buffer."
 (defun ruby-load-current-file ()
   "Load the current ruby file into the inferior Ruby process."
   (interactive)
-  (ruby-load-file (buffer-name)))
+  (ruby-load-file (buffer-file-name)))
 
 (defun ruby-send-buffer ()
   "Send the current buffer to the inferior Ruby process."
