@@ -411,9 +411,10 @@ the buffer, defaults to \"ruby\"."
 
   (let ((commandlist (split-string-and-unquote command))
         (buffer (current-buffer))
-        (process-environment process-environment))
+        (process-environment (copy-sequence process-environment)))
     ;; http://debbugs.gnu.org/15775
     (setenv "PAGER" (executable-find "cat"))
+    (setenv "RUBY_DEBUG_NO_RELINE" "true")
     (set-buffer (apply 'make-comint-in-buffer
                        name
                        (inf-ruby-choose-buffer-name name)
