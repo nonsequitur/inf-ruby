@@ -117,7 +117,7 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 
 ## Bugs
 
-* If there is a [triangle instead of prompt](https://github.com/nonsequitur/inf-ruby/issues/159), or you see a reline related error ([example](https://github.com/ruby/irb/issues/43#issuecomment-589593889)), or your REPL simply [doesn't react to input](https://github.com/nonsequitur/inf-ruby/issues/51), try putting the following in your `~/.irbrc`:
+* If there is a [triangle instead of prompt](https://github.com/nonsequitur/inf-ruby/issues/159), or you see a [reline related error](https://github.com/ruby/irb/issues/43#issuecomment-589593889), or your REPL simply [doesn't react to input](https://github.com/nonsequitur/inf-ruby/issues/51), try putting the following in your `~/.irbrc`:
 
 ```rb
 IRB.conf[:USE_MULTILINE] = false if ENV['INSIDE_EMACS']
