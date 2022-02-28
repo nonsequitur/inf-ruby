@@ -103,10 +103,9 @@ returns a string."
   :group 'inf-ruby)
 
 (defun inf-ruby--irb-command ()
-  (let ((command "irb --prompt default -r irb/completion"))
-    (if (inf-ruby--irb-needs-nomultiline-p)
-        (setq command (concat command " --nomultiline"))
-      (setq command (concat command "  --noreadline")))
+  (let ((command "irb --prompt default -r irb/completion --noreadline"))
+    (when (inf-ruby--irb-needs-nomultiline-p)
+      (setq command (concat command " --nomultiline")))
     command))
 
 (defun inf-ruby--irb-needs-nomultiline-p (&optional with-bundler)
@@ -1066,7 +1065,7 @@ automatically."
              ;; Note: this only has effect in Rails < 5.0 or >= 5.1.4
              ;; https://github.com/rails/rails/pull/29010
              (when (inf-ruby--irb-needs-nomultiline-p)
-               " -- --nomultiline"))
+               " -- --nomultiline --noreadline"))
      "rails")))
 
 (defun inf-ruby-console-rails-env ()

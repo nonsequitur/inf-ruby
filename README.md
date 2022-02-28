@@ -117,24 +117,17 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 
 ## Bugs
 
-* The REPL buffer doesn't seem to react to input and your Ruby is < 2.7?
-
-  Try putting the following code into your `~/.irbrc`
-  (issue [#51](https://github.com/nonsequitur/inf-ruby/issues/51)):
-
-```rb
-IRB.conf[:USE_READLINE] = false if ENV['INSIDE_EMACS']
-```
-
-* If your Ruby version is 2.7+ and there is a triangle instead of prompt, or you see a reline related error ([example](https://github.com/ruby/irb/issues/43#issuecomment-589593889)), try putting the following in your `~/.irbrc`:
+* If there is a [triangle instead of prompt](https://github.com/nonsequitur/inf-ruby/issues/159), or you see a reline related error ([example](https://github.com/ruby/irb/issues/43#issuecomment-589593889)), or your REPL simply [doesn't react to input](https://github.com/nonsequitur/inf-ruby/issues/51), try putting the following in your `~/.irbrc`:
 
 ```rb
 IRB.conf[:USE_MULTILINE] = false if ENV['INSIDE_EMACS']
+IRB.conf[:USE_READLINE] = false if ENV['INSIDE_EMACS']
 ```
 
 For most projects that `inf-ruby-console-auto` can recognize, we try
-to apply this flag automatically, but some cases remain where the
-users will have to do it manually.
+to apply this flag automatically (using command line arguments rather
+than `.irbrc`), but some cases remain where the users will have to do
+it manually.
 
 * Pry raises ZeroDivisionError in `lib/pry/pager.rb`?
 
