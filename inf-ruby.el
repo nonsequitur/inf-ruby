@@ -10,7 +10,7 @@
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.6.0
+;; Version: 2.6.1
 ;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software: you can redistribute it and/or modify
