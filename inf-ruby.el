@@ -7,6 +7,7 @@
 ;;         Cornelius Mika <cornelius.mika@gmail.com>
 ;;         Dmitry Gutov <dgutov@yandex.ru>
 ;;         Kyle Hargraves <pd@krh.me>
+;; Maintainer: Dmitry Gutov <dgutov@yandex.ru>
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
