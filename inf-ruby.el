@@ -579,12 +579,12 @@ the overlay."
                      0 (length display-string)
                      'face prepend-face
                      display-string)
-            ;; If the display spans multiple lines or is very long, display it at
-            ;; the beginning of the next line.
-            (when (or (string-match "\n." display-string)
-                      (> (string-width display-string)
-			 (- (window-width) (current-column))))
-              (setq display-string (concat " \n" display-string)))
+            ;; ;; If the display spans multiple lines or is very long, display it at
+            ;; ;; the beginning of the next line.
+            ;; (when (or (string-match "\n." display-string)
+            ;;           (> (string-width display-string)
+            ;;              (- (window-width) (current-column))))
+            ;;   (setq display-string (concat " \n" display-string)))
             ;; Put the cursor property only once we're done manipulating the
             ;; string, since we want it to be at the first char.
             (put-text-property 0 1 'cursor 0 display-string)
@@ -653,7 +653,17 @@ This function also removes itself from `pre-command-hook'."
             (while (string-match inf-ruby-prompt-pattern s)
               (setq s (replace-match "" t t s)))
             (error "%s" s)))
-      (buffer-substring-no-properties (point) (line-end-position)))))
+      (if (looking-at " *$")
+          (progn
+            (goto-char (1+ (match-end 0)))
+            (replace-regexp-in-string
+             "\n +" " "
+             (buffer-substring-no-properties
+              (point)
+              (progn
+                (forward-sexp)
+                (point)))))
+        (buffer-substring-no-properties (point) (line-end-position))))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
