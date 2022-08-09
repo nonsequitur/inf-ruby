@@ -830,14 +830,16 @@ Then switch to the process buffer."
     (replace-regexp-in-string "\n" "\\\\n"
       (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
 
-(defun inf-ruby-completions (prefix)
+(defun inf-ruby-completions (_prefix)
   "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
          (line (buffer-substring (save-excursion (move-beginning-of-line 1)
                                                  (point))
                                  (point)))
          (expr (inf-ruby-completion-expr-at-point))
-         (prefix-offset (- (length expr) (length prefix)))
+         (prefix-bounds (inf-ruby-completion-bounds-of-prefix))
+         (prefix (buffer-substring-no-properties (car prefix-bounds)
+                                                 (cdr prefix-bounds)))
          (comint-filt (process-filter proc))
          (kept "") completions
          ;; Guard against running completions in parallel:
@@ -883,7 +885,7 @@ Then switch to the process buffer."
         (set-process-filter proc comint-filt)))
     (mapcar
      (lambda (str)
-       (substring str prefix-offset))
+       (concat prefix (substring str (length expr))))
      completions)))
 
 (defconst inf-ruby-ruby-expr-break-chars " \t\n\"\'`><,;|&{(")
@@ -906,7 +908,7 @@ Then switch to the process buffer."
   "Return expression at point to complete."
   (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
     (and bounds
-         (buffer-substring (car bounds) (cdr bounds)))))
+         (buffer-substring-no-properties (car bounds) (cdr bounds)))))
 
 (defun inf-ruby-completion-at-point ()
   "Retrieve the list of completions and prompt the user.
