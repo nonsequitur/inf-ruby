@@ -833,11 +833,15 @@ Then switch to the process buffer."
 (defun inf-ruby-completions (prefix)
   "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
-         (line (buffer-substring (save-excursion (move-beginning-of-line 1)
-                                                 (point))
-                                 (point)))
-         (expr (inf-ruby-completion-expr-at-point))
-         (prefix-offset (- (length expr) (length prefix)))
+         (line
+          (concat
+           (buffer-substring (save-excursion (move-beginning-of-line 1)
+                                             (point))
+                             (car (inf-ruby-completion-bounds-of-prefix)))
+           ;; prefix can be different, as requested by completion style.
+           prefix))
+         (target (inf-ruby-completion-target-at-point))
+         (prefix-offset (length target))
          (comint-filt (process-filter proc))
          (kept "") completions
          ;; Guard against running completions in parallel:
@@ -871,7 +875,7 @@ Then switch to the process buffer."
                    "    Bond.agent.instance_variable_set('@weapon', old_wp) if old_wp "
                    "  end "
                    "}.call('%s', '%s')\n")
-                  (ruby-escape-single-quoted expr)
+                  (ruby-escape-single-quoted (concat target prefix))
                   (ruby-escape-single-quoted line))))
             (process-send-string proc completion-snippet)
             (while (and (not (string-match inf-ruby-prompt-pattern kept))
@@ -907,6 +911,13 @@ Then switch to the process buffer."
   (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
     (and bounds
          (buffer-substring (car bounds) (cdr bounds)))))
+
+(defun inf-ruby-completion-target-at-point ()
+  (let ((bounds (inf-ruby-completion-bounds-of-expr-at-point)))
+    (and bounds
+         (buffer-substring
+          (car bounds)
+          (car (inf-ruby-completion-bounds-of-prefix))))))
 
 (defun inf-ruby-completion-at-point ()
   "Retrieve the list of completions and prompt the user.
