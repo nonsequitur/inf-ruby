@@ -484,6 +484,14 @@ Must not contain ruby meta characters.")
 
 (defconst ruby-eval-separator "")
 
+(defun inf-ruby-file-local-name (filename)
+  "Convert FILENAME so that it can be passed to an inferior Ruby
+process running over TRAMP, by removing the remote part of it."
+  ;; TODO: Replace this implementation with (file-local-name ...) when the
+  ;; oldest supported Emacs version is bumped to 26.1
+  (or (file-remote-p filename 'localname)
+      filename))
+
 (defun ruby-send-region (start end &optional print prefix suffix line-adjust)
   "Send the current region to the inferior Ruby process."
   (interactive "r\nP")
@@ -508,7 +516,8 @@ Must not contain ruby meta characters.")
 	(setq line (+ line line-adjust)))
     (comint-send-string (inf-ruby-proc) (format "eval <<'%s', %s, %S, %d\n"
                                                 term inf-ruby-eval-binding
-                                                file line))
+                                                (inf-ruby-file-local-name file)
+                                                line))
     (if prefix
 	(comint-send-string (inf-ruby-proc) prefix))
     (comint-send-region (inf-ruby-proc) start end)
@@ -797,7 +806,7 @@ Then switch to the process buffer."
   (setq ruby-prev-l/c-dir/file (cons (file-name-directory    file-name)
                                      (file-name-nondirectory file-name)))
   (comint-send-string (inf-ruby-proc) (concat "(load \""
-                                              file-name
+                                              (inf-ruby-file-local-name file-name)
                                               "\"\)\n")))
 
 (defun ruby-load-current-file ()
