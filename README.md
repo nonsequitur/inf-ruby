@@ -63,8 +63,15 @@ Additionally, consider adding
 (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
 ```
 
+or
+
+```lisp
+(add-hook 'compilation-filter-hook 'inf-ruby-auto-enter-and-focus)
+```
+
 to your init file to automatically switch from common Ruby compilation
-modes to interact with a debugger.
+modes to interact with a debugger. The latter snippet will also select
+the compilation window and move point to the breakpoint prompt.
 
 ### Custom Prompts
 

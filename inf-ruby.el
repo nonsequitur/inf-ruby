@@ -1211,14 +1211,27 @@ Gemfile, it should use the `gemspec' instruction."
 
 ;;;###autoload
 (defun inf-ruby-auto-enter ()
-  "Switch to `inf-ruby-mode' if the breakpoint pattern matches the current line."
-  (when (and (inf-ruby-in-ruby-compilation-modes major-mode)
-             (save-excursion
-               (beginning-of-line)
-               (re-search-forward inf-ruby-breakpoint-pattern nil t)))
-    ;; Exiting excursion before this call to get the prompt fontified.
-    (inf-ruby-switch-from-compilation)
-    (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit nil t)))
+  "Switch to `inf-ruby-mode' if the breakpoint pattern matches the current line.
+Return the end position of the breakpoint prompt."
+  (let (pt)
+    (when (and (inf-ruby-in-ruby-compilation-modes major-mode)
+               (save-excursion
+                 (beginning-of-line)
+                 (setq pt
+                       (re-search-forward inf-ruby-breakpoint-pattern nil t))))
+      ;; Exiting excursion before this call to get the prompt fontified.
+      (inf-ruby-switch-from-compilation)
+      (add-hook 'comint-input-filter-functions 'inf-ruby-auto-exit nil t))
+    pt))
+
+;;;###autoload
+(defun inf-ruby-auto-enter-and-focus ()
+  "Switch to `inf-ruby-mode' on a breakpoint, select that window and set point."
+  (let ((window (get-buffer-window))
+        (pt (inf-ruby-auto-enter)))
+    (when (and pt window)
+      (select-window window)
+      (goto-char pt))))
 
 ;;;###autoload
 (defun inf-ruby-auto-exit (input)
