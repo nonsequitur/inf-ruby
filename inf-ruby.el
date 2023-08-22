@@ -1049,15 +1049,16 @@ This checks if the current line is a pry or ruby-debug prompt.")
 
 ;;;###autoload
 (defun inf-ruby-console-auto ()
-  "Run the appropriate Ruby console command.
+  "Run the Ruby console command appropriate for the project.
 The command and the directory to run it from are detected
-automatically."
+automatically from `inf-ruby-console-patterns-alist' which
+contains the configuration for the known project types."
   (interactive)
   (let* ((dir (locate-dominating-file default-directory
                                       #'inf-ruby-console-match))
          (type (inf-ruby-console-match dir))
          (fun (intern (format "inf-ruby-console-%s" type))))
-    (unless type (error "No matching directory found"))
+    (unless type (error "No known project type found. Try `M-x inf-ruby' instead."))
     (funcall fun dir)))
 
 (defun inf-ruby-console-rails-p ()
