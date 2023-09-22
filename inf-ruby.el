@@ -663,7 +663,7 @@ This function also removes itself from `pre-command-hook'."
                        (looking-at inf-ruby-first-prompt-pattern)))
         (accept-process-output proc))
       (re-search-backward inf-ruby-prompt-pattern)
-      (or (re-search-forward " => " (car comint-last-prompt) t)
+      (or (re-search-forward "=> " (car comint-last-prompt) t)
           ;; Evaluation seems to have failed.
           ;; Try to extract the error string.
           (let* ((inhibit-field-text-motion t)
