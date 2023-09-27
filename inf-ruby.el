@@ -701,16 +701,20 @@ This function also removes itself from `pre-command-hook'."
                 (or (bound-and-true-p comint-max-line-length)
                     1024))) ;; For Emacs < 28
         (comint-send-string (inf-ruby-proc) code)
-      (let ((tempfile (make-temp-file "rb")))
+      (let* ((temporary-file-directory
+              (if (file-remote-p default-directory)
+                  (concat (file-remote-p default-directory) "/tmp")
+                temporary-file-directory))
+             (tempfile (make-temp-file "rb")))
         (with-temp-file tempfile
           (insert (format "File.delete(%S)\n" tempfile))
-          (insert string)
-          (comint-send-string (inf-ruby-proc)
-                              (format "eval(File.read(%S), %s%s)\n"
-                                      tempfile
-                                      inf-ruby-eval-binding
-                                      file-and-lineno
-                                      tempfile)))))))
+          (insert string))
+        (comint-send-string (inf-ruby-proc)
+                            (format "eval(File.read(%S), %s%s)\n"
+                                    (inf-ruby-file-local-name tempfile)
+                                    inf-ruby-eval-binding
+                                    file-and-lineno
+                                    tempfile))))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
