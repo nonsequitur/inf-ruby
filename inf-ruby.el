@@ -705,13 +705,14 @@ This function also removes itself from `pre-command-hook'."
               (if (file-remote-p default-directory)
                   (concat (file-remote-p default-directory) "/tmp")
                 temporary-file-directory))
-             (tempfile (make-temp-file "rb")))
+             (tempfile (make-temp-file "rb"))
+             (tempfile-local-name (inf-ruby-file-local-name tempfile)))
         (with-temp-file tempfile
-          (insert (format "File.delete(%S)\n" tempfile))
+          (insert (format "File.delete(%S)\n" tempfile-local-name))
           (insert string))
         (comint-send-string (inf-ruby-proc)
                             (format "eval(File.read(%S), %s%s)\n"
-                                    (inf-ruby-file-local-name tempfile)
+                                    tempfile-local-name
                                     inf-ruby-eval-binding
                                     file-and-lineno
                                     tempfile))))))
