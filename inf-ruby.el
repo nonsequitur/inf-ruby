@@ -12,7 +12,7 @@
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
 ;; Version: 2.7.0
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "26.1"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -495,16 +495,14 @@ process running over TRAMP, by removing the remote part of it."
 (defun ruby-send-region (start end &optional print prefix suffix line-adjust)
   "Send the current region to the inferior Ruby process."
   (interactive "r\nP")
-  (let (term (file (or buffer-file-name (buffer-name))) line)
+  (let ((file (or buffer-file-name (buffer-name)))
+        line)
     (save-excursion
       (save-restriction
         (widen)
         (goto-char start)
         (setq line (+ start (forward-line (- start)) 1))
-        (goto-char start)
-        (while (progn
-                 (setq term (apply 'format ruby-send-terminator (random) (current-time)))
-                 (re-search-forward (concat "^" (regexp-quote term) "$") end t)))))
+        (goto-char start)))
     ;; compilation-parse-errors parses from second line.
     (save-excursion
       (let ((m (process-mark (inf-ruby-proc))))
@@ -514,16 +512,10 @@ process running over TRAMP, by removing the remote part of it."
         (set-marker m (point))))
     (if line-adjust
 	(setq line (+ line line-adjust)))
-    (comint-send-string (inf-ruby-proc) (format "eval <<'%s', %s, %S, %d\n"
-                                                term inf-ruby-eval-binding
-                                                (inf-ruby-file-local-name file)
-                                                line))
-    (if prefix
-	(comint-send-string (inf-ruby-proc) prefix))
-    (comint-send-region (inf-ruby-proc) start end)
-    (if suffix
-	(comint-send-string (inf-ruby-proc) suffix))
-    (comint-send-string (inf-ruby-proc) (concat "\n" term "\n"))
+    (ruby-send-string (concat prefix
+                              (buffer-substring-no-properties start end)
+                              suffix)
+                      file line)
     (ruby-print-result print)))
 
 (defface inf-ruby-result-overlay-face
@@ -682,6 +674,46 @@ This function also removes itself from `pre-command-hook'."
                 (forward-sexp)
                 (point)))))
         (buffer-substring-no-properties (point) (line-end-position))))))
+
+(defun ruby-shell--encode-string (string)
+  "Escape all backslashes, double quotes, newlines, and # in STRING."
+  (cl-reduce (lambda (string subst)
+               (replace-regexp-in-string (car subst) (cdr subst) string))
+             '(("\\\\" . "\\\\\\\\")
+               ("\"" . "\\\\\"")
+               ("#" . "\\\\#")
+               ("\n" . "\\\\n"))
+             :initial-value string))
+
+(defun ruby-send-string (string &optional file line)
+  "Send STRING to the inferior Ruby process.
+Optionally provide FILE and LINE metadata to Ruby."
+  (interactive
+   (list (read-string "Ruby command: ") nil t))
+  (let* ((file-and-lineno (concat (when file
+                                    (format ", %S" (inf-ruby-file-local-name file)))
+                                  (when (and file line)
+                                    (format ", %d" line))))
+         (code (format "eval(\"%s\", %s%s)\n"
+                       (ruby-shell--encode-string string)
+                       inf-ruby-eval-binding
+                       file-and-lineno)))
+    (if (or (null (process-tty-name (inf-ruby-proc)))
+            (<= (string-bytes code)
+                (or (bound-and-true-p comint-max-line-length)
+                    1024))) ;; For Emacs < 28
+        (comint-send-string (inf-ruby-proc) code)
+      (let* ((temporary-file-directory (temporary-file-directory))
+             (tempfile (make-temp-file "rb"))
+             (tempfile-local-name (inf-ruby-file-local-name tempfile)))
+        (with-temp-file tempfile
+          (insert (format "File.delete(%S)\n" tempfile-local-name))
+          (insert string))
+        (comint-send-string (inf-ruby-proc)
+                            (format "eval(File.read(%S), %s%s)\n"
+                                    tempfile-local-name
+                                    inf-ruby-eval-binding
+                                    file-and-lineno))))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
