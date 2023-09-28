@@ -136,6 +136,14 @@ to apply this flag automatically (using command line arguments rather
 than `.irbrc`), but some cases remain where the users will have to do
 it manually.
 
+* IRB doesn't show the prompt after you send some input until you
+  press RET again? And `C-x C-e` freezes in Ruby buffers?
+
+IRB 1.2.x broke the `--noreadline` support
+([#137](https://github.com/nonsequitur/inf-ruby/issues/137),
+[IRB#127](https://github.com/ruby/irb/issues/127)). Upgrade to IRB
+1.3.0 or newer for better experience.
+
 * Pry raises ZeroDivisionError in `lib/pry/pager.rb`?
 
   Put `Pry.config.pager = false if ENV["INSIDE_EMACS"]` into your `~/.pryrc`.
