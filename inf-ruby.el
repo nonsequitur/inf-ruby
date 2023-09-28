@@ -676,12 +676,13 @@ This function also removes itself from `pre-command-hook'."
         (buffer-substring-no-properties (point) (line-end-position))))))
 
 (defun ruby-shell--encode-string (string)
-  "Escape all backslashes, single quotes, and newlines in STRING."
+  "Escape all backslashes, double quotes, newlines, and # in STRING."
   (cl-reduce (lambda (string subst)
                (replace-regexp-in-string (car subst) (cdr subst) string))
              '(("\\\\" . "\\\\\\\\")
-               ("'" . "\\\\'")
-               ("\n" . "'\"\\\\n\"'"))
+               ("\"" . "\\\\\"")
+               ("#" . "\\\\#")
+               ("\n" . "\\\\n"))
              :initial-value string))
 
 (defun ruby-send-string (string &optional file line)
@@ -693,7 +694,7 @@ Optionally provide FILE and LINE metadata to Ruby."
                                     (format ", %S" (inf-ruby-file-local-name file)))
                                   (when (and file line)
                                     (format ", %d" line))))
-         (code (format "eval('%s', %s%s)\n"
+         (code (format "eval(\"%s\", %s%s)\n"
                        (ruby-shell--encode-string string)
                        inf-ruby-eval-binding
                        file-and-lineno)))
