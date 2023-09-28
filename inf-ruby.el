@@ -12,7 +12,7 @@
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
 ;; Version: 2.7.0
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "26.1"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -685,7 +685,8 @@ This function also removes itself from `pre-command-hook'."
              :initial-value string))
 
 (defun ruby-send-string (string &optional file line)
-  "Send STRING to the inferior Ruby process."
+  "Send STRING to the inferior Ruby process.
+Optionally provide FILE and LINE metadata to Ruby."
   (interactive
    (list (read-string "Ruby command: ") nil t))
   (let* ((file-and-lineno (concat (when file
@@ -701,10 +702,7 @@ This function also removes itself from `pre-command-hook'."
                 (or (bound-and-true-p comint-max-line-length)
                     1024))) ;; For Emacs < 28
         (comint-send-string (inf-ruby-proc) code)
-      (let* ((temporary-file-directory
-              (if (file-remote-p default-directory)
-                  (concat (file-remote-p default-directory) "/tmp")
-                temporary-file-directory))
+      (let* ((temporary-file-directory (temporary-file-directory))
              (tempfile (make-temp-file "rb"))
              (tempfile-local-name (inf-ruby-file-local-name tempfile)))
         (with-temp-file tempfile
@@ -714,8 +712,7 @@ This function also removes itself from `pre-command-hook'."
                             (format "eval(File.read(%S), %s%s)\n"
                                     tempfile-local-name
                                     inf-ruby-eval-binding
-                                    file-and-lineno
-                                    tempfile))))))
+                                    file-and-lineno))))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
