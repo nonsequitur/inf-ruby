@@ -874,12 +874,6 @@ Then switch to the process buffer."
   (ruby-send-line)
   (ruby-switch-to-inf t))
 
-(defun ruby-escape-single-quoted (str)
-  "Escape single quotes, double quotes and newlines in STR."
-  (replace-regexp-in-string "'" "\\\\'"
-    (replace-regexp-in-string "\n" "\\\\n"
-      (replace-regexp-in-string "\\\\" "\\\\\\\\" str))))
-
 (defun inf-ruby-completions (prefix)
   "Return a list of completions for the Ruby expression starting with EXPR."
   (let* ((proc (inf-ruby-proc))
@@ -924,9 +918,9 @@ Then switch to the process buffer."
                    "  ensure"
                    "    Bond.agent.instance_variable_set('@weapon', old_wp) if old_wp "
                    "  end "
-                   "}.call('%s', '%s')\n")
-                  (ruby-escape-single-quoted (concat target prefix))
-                  (ruby-escape-single-quoted line))))
+                   "}.call(\"%s\", \"%s\")\n")
+                  (ruby-shell--encode-string (concat target prefix))
+                  (ruby-shell--encode-string line))))
             (process-send-string proc completion-snippet)
             (while (and (not (string-match inf-ruby-prompt-pattern kept))
                         (accept-process-output proc 2)))
