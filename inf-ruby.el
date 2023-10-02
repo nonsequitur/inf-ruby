@@ -483,14 +483,6 @@ Must not contain ruby meta characters.")
 
 (defconst ruby-eval-separator "")
 
-(defun inf-ruby-file-local-name (filename)
-  "Convert FILENAME so that it can be passed to an inferior Ruby
-process running over TRAMP, by removing the remote part of it."
-  ;; TODO: Replace this implementation with (file-local-name ...) when the
-  ;; oldest supported Emacs version is bumped to 26.1
-  (or (file-remote-p filename 'localname)
-      filename))
-
 (defun ruby-send-region (start end &optional print prefix suffix line-adjust)
   "Send the current region to the inferior Ruby process."
   (interactive "r\nP")
@@ -690,7 +682,7 @@ Optionally provide FILE and LINE metadata to Ruby."
   (interactive
    (list (read-string "Ruby command: ") nil t))
   (let* ((file-and-lineno (concat (when file
-                                    (format ", %S" (inf-ruby-file-local-name file)))
+                                    (format ", %S" (file-local-name file)))
                                   (when (and file line)
                                     (format ", %d" line))))
          (code (format "eval(\"%s\", %s%s)\n"
@@ -704,7 +696,7 @@ Optionally provide FILE and LINE metadata to Ruby."
         (comint-send-string (inf-ruby-proc) code)
       (let* ((temporary-file-directory (temporary-file-directory))
              (tempfile (make-temp-file "rb"))
-             (tempfile-local-name (inf-ruby-file-local-name tempfile)))
+             (tempfile-local-name (file-local-name tempfile)))
         (with-temp-file tempfile
           (insert (format "File.delete(%S)\n" tempfile-local-name))
           (insert string))
@@ -837,7 +829,7 @@ Then switch to the process buffer."
   (setq ruby-prev-l/c-dir/file (cons (file-name-directory    file-name)
                                      (file-name-nondirectory file-name)))
   (comint-send-string (inf-ruby-proc) (concat "(load \""
-                                              (inf-ruby-file-local-name file-name)
+                                              (file-local-name file-name)
                                               "\"\)\n")))
 
 (defun ruby-load-current-file ()
