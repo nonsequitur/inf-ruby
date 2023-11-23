@@ -1,4 +1,4 @@
-;;; inf-ruby.el --- Run a Ruby process in a buffer
+;;; inf-ruby.el --- Run a Ruby process in a buffer -*- lexical-binding:t -*-
 
 ;; Copyright (C) 1999-2008 Yukihiro Matsumoto, Nobuyoshi Nakada
 
@@ -126,7 +126,7 @@ available ones.  Otherwise, just use the value.
 
 Currently only affects Rails and Hanami consoles."
   :type '(choice
-          (const ask :tag "Ask the user")
+          (const :tag "Ask the user" ask)
           (string :tag "Environment name")))
 
 (defcustom inf-ruby-reuse-older-buffers t
@@ -520,9 +520,9 @@ Must not contain ruby meta characters.")
 
 (defun inf-ruby--make-overlay (l r type &rest props)
   "Place an overlay between L and R and return it.
-TYPE is a symbol put on the overlay's category property.  It is
+TYPE is a symbol put on the overlay\\='s category property.  It is
 used to easily remove all overlays from a region with:
-    (remove-overlays start end 'category TYPE)
+    (remove-overlays start end \\='category TYPE)
 PROPS is a plist of properties and values to add to the overlay."
   (let ((o (make-overlay l (or r l) (current-buffer))))
     (overlay-put o 'category type)
@@ -551,7 +551,6 @@ the overlay."
   (let ((format " => %s ")
 	(prepend-face 'inf-ruby-result-overlay-face)
 	(type 'result))
-    (declare (indent 1))
     (while (keywordp (car props))
       (setq props (cddr props)))
     ;; If the marker points to a dead buffer, don't do anything.
@@ -631,8 +630,7 @@ This function also removes itself from `pre-command-hook'."
 
 (defun ruby-print-result (&optional insert)
   "Print the result of the last evaluation in the current buffer."
-  (let ((proc (inf-ruby-proc))
-        (result (ruby-print-result-value)))
+  (let ((result (ruby-print-result-value)))
     (if insert
         (insert result)
       (inf-ruby--eval-overlay result))))
@@ -856,7 +854,7 @@ Then switch to the process buffer."
   (interactive)
   (save-restriction
     (widen)
-    (ruby-send-region (point-at-bol) (point-at-eol))))
+    (ruby-send-region (line-beginning-position) (line-end-position))))
 
 (defun ruby-send-line-and-go ()
   "Send the current line to the inferior Ruby process.
@@ -882,7 +880,7 @@ Then switch to the process buffer."
          ;; Guard against running completions in parallel:
          inf-ruby-at-top-level-prompt-p)
     (unless (equal "(rdb:1) " inf-ruby-last-prompt)
-      (set-process-filter proc (lambda (proc string) (setq kept (concat kept string))))
+      (set-process-filter proc (lambda (_proc string) (setq kept (concat kept string))))
       (unwind-protect
           (let ((completion-snippet
                  (format
