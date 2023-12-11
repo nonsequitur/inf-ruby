@@ -11,7 +11,7 @@
 ;; URL: http://github.com/nonsequitur/inf-ruby
 ;; Created: 8 April 1998
 ;; Keywords: languages ruby
-;; Version: 2.8.0
+;; Version: 2.8.1
 ;; Package-Requires: ((emacs "26.1"))
 
 ;; This program is free software: you can redistribute it and/or modify
@@ -983,12 +983,13 @@ interactive mode, i.e. hits a debugger breakpoint."
         (arguments compilation-arguments)
         (orig-mode-line-process mode-line-process)
         (orig-error-alist compilation-error-regexp-alist)
-        (cst compilation--start-time))
+        (cst (bound-and-true-p compilation--start-time)))
     (inf-ruby-mode)
     (setq-local inf-ruby-orig-compilation-mode mode)
     (setq-local compilation-arguments arguments)
     (setq-local inf-ruby-orig-error-regexp-alist orig-error-alist)
-    (setq-local compilation--start-time cst)
+    (when cst
+      (setq-local compilation--start-time cst))
     (when orig-mode-line-process
       (setq mode-line-process orig-mode-line-process)))
   (let ((proc (get-buffer-process (current-buffer))))
@@ -1011,12 +1012,13 @@ Otherwise, just toggle read-only status."
             (arguments compilation-arguments)
             (filter inf-ruby-orig-process-filter)
             (errors inf-ruby-orig-error-regexp-alist)
-            (cst compilation--start-time))
+            (cst (bound-and-true-p compilation--start-time)))
         (funcall inf-ruby-orig-compilation-mode)
         (setq mode-line-process orig-mode-line-process)
         (setq-local compilation-arguments arguments)
         (setq-local compilation-error-regexp-alist errors)
-        (setq-local compilation--start-time cst)
+        (when cst
+          (setq-local compilation--start-time cst))
         (when proc
           (set-process-filter proc filter)))
     (read-only-mode)))
