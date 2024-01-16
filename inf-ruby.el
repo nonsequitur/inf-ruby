@@ -1297,7 +1297,7 @@ Return the end position of the breakpoint prompt."
     (unless (file-exists-p "Gemfile")
       (error "The directory must contain a Gemfile"))
     (cond
-     ((inf-ruby-file-contents-match "Gemfile" "[\"']pry[\"']")
+     ((inf-ruby-file-contents-match "Gemfile" "^[ \t]*gem[ \t]*[\"']pry[\"']")
       (inf-ruby-console-run "bundle exec pry" "pry"))
      (t
       (inf-ruby-console-run "bundle console" "bundle console")))))
