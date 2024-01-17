@@ -124,6 +124,10 @@ type <kbd>M-x describe-function [RET] inf-ruby-minor-mode [RET]</kbd>.
 
 ## Bugs
 
+* To use Pry in `inf-ruby` with Ruby 3.3, you should install
+`readline-ext` (and add it to `Gemfile`, if it is used)
+([dgutov/robe#147](https://github.com/dgutov/robe/issues/147#issuecomment-1894806030)).
+
 * If there is a [triangle instead of prompt](https://github.com/nonsequitur/inf-ruby/issues/159), or you see a [reline related error](https://github.com/ruby/irb/issues/43#issuecomment-589593889), or your REPL simply [doesn't react to input](https://github.com/nonsequitur/inf-ruby/issues/51), try putting the following in your `~/.irbrc`:
 
 ```rb
