@@ -742,6 +742,7 @@ Optionally provide FILE and LINE metadata to Ruby."
   (interactive "P")
   (let (beg)
     (save-excursion
+      (skip-chars-backward " \t\n")
       (cond
        ((and (derived-mode-p 'ruby-mode)
              (bound-and-true-p smie-rules-function))
