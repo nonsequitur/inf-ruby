@@ -110,10 +110,10 @@ returns a string."
     command))
 
 (defun inf-ruby--irb-needs-nomultiline-p (&optional with-bundler)
-  (let* ((output (shell-command-to-string
-                  (concat
-                   (when with-bundler "bundle exec ")
-                   "irb -v")))
+  (let* ((output (car (last (apply #'process-lines
+                                   (append
+                                    (when with-bundler '("bundle" "exec"))
+                                    '("irb" "-v"))))))
          (fields (split-string output "[ (]")))
     (if (equal (car fields) "irb")
         (version<= "1.2.0" (nth 1 fields))
