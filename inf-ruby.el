@@ -704,6 +704,11 @@ Optionally provide FILE and LINE metadata to Ruby."
                                     inf-ruby-eval-binding
                                     file-and-lineno))))))
 
+(defun ruby-send-exit ()
+  "Send 'exit' to the inferior Ruby process"
+  (interactive)
+  (ruby-send-string "exit"))
+
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
   (interactive)
