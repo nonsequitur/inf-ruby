@@ -209,7 +209,6 @@ next one.")
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-x") 'ruby-send-definition)
     (define-key map (kbd "C-x C-e") 'ruby-send-last-stmt)
-    (define-key map (kbd "C-c C-e") 'ruby-send-exit)
     (define-key map (kbd "C-c C-b") 'ruby-send-block)
     (define-key map (kbd "C-c M-b") 'ruby-send-block-and-go)
     (define-key map (kbd "C-c C-x") 'ruby-send-definition)
@@ -220,6 +219,7 @@ next one.")
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-c C-k") 'ruby-load-current-file)
     (define-key map (kbd "C-c C-s") 'inf-ruby)
+    (define-key map (kbd "C-c C-q") 'ruby-quit)
     (easy-menu-define
       inf-ruby-minor-mode-menu
       map
@@ -705,7 +705,7 @@ Optionally provide FILE and LINE metadata to Ruby."
                                     inf-ruby-eval-binding
                                     file-and-lineno))))))
 
-(defun ruby-send-exit ()
+(defun ruby-quit ()
   "Send 'exit' to the inferior Ruby process"
   (interactive)
   (ruby-send-string "exit"))
