@@ -468,8 +468,18 @@ the buffer, defaults to \"ruby\"."
 See variable `inf-ruby-buffers'."
   (or (get-buffer-process (if (eq major-mode 'inf-ruby-mode)
                               (current-buffer)
-                            (or (inf-ruby-buffer)
-                                inf-ruby-buffer)))
+                            (or
+                             ;; Prioritize the first visible buffer,
+                             ;; e.g. for the case when it's inf-ruby
+                             ;; switched from compilation mode.
+                             (cl-find-if
+                              (lambda (buf)
+                                (provided-mode-derived-p
+                                 (buffer-local-value 'major-mode buf)
+                                 #'inf-ruby-mode))
+                              (mapcar #'window-buffer (window-list)))
+                             (inf-ruby-buffer)
+                             inf-ruby-buffer)))
       (error "No current process. See variable inf-ruby-buffers")))
 
 ;; These commands are added to the inf-ruby-minor-mode keymap:
@@ -638,8 +648,7 @@ This function also removes itself from `pre-command-hook'."
 
 (defun ruby-print-result-value ()
   (let ((proc (inf-ruby-proc)))
-    (with-current-buffer (or (inf-ruby-buffer)
-                             inf-ruby-buffer)
+    (with-current-buffer (process-buffer proc)
       (while (not (and comint-last-prompt
                        (goto-char (car comint-last-prompt))
                        (looking-at inf-ruby-first-prompt-pattern)))
