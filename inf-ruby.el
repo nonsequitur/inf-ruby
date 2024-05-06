@@ -706,7 +706,7 @@ Optionally provide FILE and LINE metadata to Ruby."
                                     file-and-lineno))))))
 
 (defun ruby-quit ()
-  "Send 'exit' to the inferior Ruby process"
+  "Send `exit' to the inferior Ruby process"
   (interactive)
   (ruby-send-string "exit"))
 
