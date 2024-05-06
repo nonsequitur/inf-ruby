@@ -219,6 +219,7 @@ next one.")
     (define-key map (kbd "C-c C-l") 'ruby-load-file)
     (define-key map (kbd "C-c C-k") 'ruby-load-current-file)
     (define-key map (kbd "C-c C-s") 'inf-ruby)
+    (define-key map (kbd "C-c C-q") 'ruby-quit)
     (easy-menu-define
       inf-ruby-minor-mode-menu
       map
@@ -703,6 +704,11 @@ Optionally provide FILE and LINE metadata to Ruby."
                                     tempfile-local-name
                                     inf-ruby-eval-binding
                                     file-and-lineno))))))
+
+(defun ruby-quit ()
+  "Send 'exit' to the inferior Ruby process"
+  (interactive)
+  (ruby-send-string "exit"))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
