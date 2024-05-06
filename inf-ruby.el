@@ -472,15 +472,19 @@ See variable `inf-ruby-buffers'."
                              ;; Prioritize the first visible buffer,
                              ;; e.g. for the case when it's inf-ruby
                              ;; switched from compilation mode.
-                             (cl-find-if
-                              (lambda (buf)
-                                (provided-mode-derived-p
-                                 (buffer-local-value 'major-mode buf)
-                                 #'inf-ruby-mode))
-                              (mapcar #'window-buffer (window-list)))
+                             (inf-ruby-fromcomp-buffer)
                              (inf-ruby-buffer)
                              inf-ruby-buffer)))
       (error "No current process. See variable inf-ruby-buffers")))
+
+(defun inf-ruby-fromcomp-buffer ()
+  "Return the first visible compilation buffer in `inf-ruby-mode'."
+  (cl-find-if
+   (lambda (buf)
+     (and (buffer-local-value 'inf-ruby-orig-compilation-mode buf)
+          (provided-mode-derived-p (buffer-local-value 'major-mode buf)
+                                   'inf-ruby-mode)))
+   (mapcar #'window-buffer (window-list))))
 
 ;; These commands are added to the inf-ruby-minor-mode keymap:
 
@@ -802,7 +806,7 @@ Optionally provide FILE and LINE metadata to Ruby."
 With argument, positions cursor at end of buffer."
   (interactive "P")
   (let ((buffer (current-buffer))
-        (inf-ruby-buffer* (or (inf-ruby-buffer) inf-ruby-buffer)))
+        (inf-ruby-buffer* (or (inf-ruby-fromcomp-buffer) (inf-ruby-buffer) inf-ruby-buffer)))
     (if inf-ruby-buffer*
         (progn
           (pop-to-buffer inf-ruby-buffer*)
