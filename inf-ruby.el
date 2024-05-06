@@ -708,7 +708,13 @@ Optionally provide FILE and LINE metadata to Ruby."
 (defun ruby-quit ()
   "Send `exit' to the inferior Ruby process"
   (interactive)
-  (ruby-send-string "exit"))
+  (ruby-send-string "exit")
+  (let ((buffer (process-buffer (inf-ruby-proc))))
+    (when (buffer-local-value 'inf-ruby-orig-compilation-mode
+                              buffer)
+      (run-with-idle-timer 0 nil
+                           #'inf-ruby-switch-to-compilation
+                           buffer))))
 
 (defun ruby-send-definition ()
   "Send the current definition to the inferior Ruby process."
@@ -1008,26 +1014,33 @@ interactive mode, i.e. hits a debugger breakpoint."
         (delete-region (match-beginning 0) (point))
         (comint-output-filter proc line)))))
 
+(defun inf-ruby-switch-to-compilation (&optional buffer)
+  "Switch to compilation mode this buffer was in before
+`inf-ruby-switch-from-compilation' was called.
+When BUFFER is non-nil, do that in that buffer."
+  (with-current-buffer (or buffer (current-buffer))
+    (let ((orig-mode-line-process mode-line-process)
+          (proc (get-buffer-process (current-buffer)))
+          (arguments compilation-arguments)
+          (filter inf-ruby-orig-process-filter)
+          (errors inf-ruby-orig-error-regexp-alist)
+          (cst (bound-and-true-p compilation--start-time)))
+      (funcall inf-ruby-orig-compilation-mode)
+      (setq mode-line-process orig-mode-line-process)
+      (setq-local compilation-arguments arguments)
+      (setq-local compilation-error-regexp-alist errors)
+      (when cst
+        (setq-local compilation--start-time cst))
+      (when proc
+        (set-process-filter proc filter)))))
+
 (defun inf-ruby-maybe-switch-to-compilation ()
   "Switch to compilation mode this buffer was in before
 `inf-ruby-switch-from-compilation' was called, if it was.
 Otherwise, just toggle read-only status."
   (interactive)
   (if inf-ruby-orig-compilation-mode
-      (let ((orig-mode-line-process mode-line-process)
-            (proc (get-buffer-process (current-buffer)))
-            (arguments compilation-arguments)
-            (filter inf-ruby-orig-process-filter)
-            (errors inf-ruby-orig-error-regexp-alist)
-            (cst (bound-and-true-p compilation--start-time)))
-        (funcall inf-ruby-orig-compilation-mode)
-        (setq mode-line-process orig-mode-line-process)
-        (setq-local compilation-arguments arguments)
-        (setq-local compilation-error-regexp-alist errors)
-        (when cst
-          (setq-local compilation--start-time cst))
-        (when proc
-          (set-process-filter proc filter)))
+      (inf-ruby-switch-to-compilation)
     (read-only-mode)))
 
 ;;;###autoload
