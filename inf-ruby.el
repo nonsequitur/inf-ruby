@@ -721,7 +721,7 @@ Optionally provide FILE and LINE metadata to Ruby."
 (defun ruby-quit ()
   "Send `exit' to the inferior Ruby process"
   (interactive)
-  (ruby-send-string "exit")
+  (process-send-string (inf-ruby-proc) "exit\r")
   (let ((buffer (process-buffer (inf-ruby-proc))))
     (when (buffer-local-value 'inf-ruby-orig-compilation-mode
                               buffer)
