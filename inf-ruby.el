@@ -135,6 +135,14 @@ over by a previous Ruby process, as long as it was launched in
 the same directory and used the same base name."
   :type 'boolean)
 
+(defcustom inf-ruby-interact-with-fromcomp t
+  "When non-nil, commands will use \"from compilation\" buffers.
+It's buffers that switched to `inf-ruby-mode' from a Compilation mode,
+such as `rspec-compilation-mode', either automatically upon seeing a
+\"breakpoint\" or manually. The commands in question will be such
+commands as `ruby-send-last-stmt' or `ruby-switch-to-inf'."
+  :type 'boolean)
+
 (defconst inf-ruby-prompt-format
   (concat
    (mapconcat
@@ -472,7 +480,8 @@ See variable `inf-ruby-buffers'."
                              ;; Prioritize the first visible buffer,
                              ;; e.g. for the case when it's inf-ruby
                              ;; switched from compilation mode.
-                             (inf-ruby-fromcomp-buffer)
+                             (and inf-ruby-interact-with-fromcomp
+                                  (inf-ruby-fromcomp-buffer))
                              (inf-ruby-buffer)
                              inf-ruby-buffer)))
       (error "No current process. See variable inf-ruby-buffers")))
@@ -806,7 +815,10 @@ Optionally provide FILE and LINE metadata to Ruby."
 With argument, positions cursor at end of buffer."
   (interactive "P")
   (let ((buffer (current-buffer))
-        (inf-ruby-buffer* (or (inf-ruby-fromcomp-buffer) (inf-ruby-buffer) inf-ruby-buffer)))
+        (inf-ruby-buffer* (or (and inf-ruby-interact-with-fromcomp
+                                   (inf-ruby-fromcomp-buffer))
+                              (inf-ruby-buffer)
+                              inf-ruby-buffer)))
     (if inf-ruby-buffer*
         (progn
           (pop-to-buffer inf-ruby-buffer*)
