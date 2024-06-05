@@ -706,11 +706,17 @@ Optionally provide FILE and LINE metadata to Ruby."
                                     (format ", %S" (file-local-name file)))
                                   (when (and file line)
                                     (format ", %d" line))))
+         (proc (inf-ruby-proc))
+         (inf-ruby-eval-binding (if (buffer-local-value
+                                     'inf-ruby-orig-compilation-mode
+                                     (process-buffer proc))
+                                    "binding"
+                                  inf-ruby-eval-binding))
          (code (format "eval(\"%s\", %s%s)\n"
                        (ruby-shell--encode-string string)
                        inf-ruby-eval-binding
                        file-and-lineno)))
-    (if (or (null (process-tty-name (inf-ruby-proc)))
+    (if (or (null (process-tty-name proc))
             (<= (string-bytes code)
                 (or (bound-and-true-p comint-max-line-length)
                     1024))) ;; For Emacs < 28
