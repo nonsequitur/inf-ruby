@@ -591,7 +591,9 @@ the overlay."
           (let* ((beg (if (consp where)
                           (car where)
 			(save-excursion
-                          (backward-sexp 1)
+                          (condition-case nil
+                              (backward-sexp 1)
+                            (scan-error nil))
                           (point))))
 		 (end (if (consp where)
                           (cdr where)
