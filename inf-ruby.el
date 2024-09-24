@@ -1133,11 +1133,8 @@ contains the configuration for the known project types."
     (funcall fun dir)))
 
 (defun inf-ruby-console-rails-p ()
-  (and (file-exists-p "Gemfile.lock")
-       (inf-ruby-file-contents-match "Gemfile.lock" "^ +railties ")
-       (file-exists-p "config/application.rb")
-       (inf-ruby-file-contents-match "config/application.rb"
-                                     "\\_<Rails::Application\\_>")))
+  (or (file-exists-p "bin/rails")
+      (file-exists-p "script/rails")))
 
 (defun inf-ruby-console-read-directory (type)
   (or
@@ -1168,11 +1165,13 @@ contains the configuration for the known project types."
   "Run Rails console in DIR."
   (interactive (list (inf-ruby-console-read-directory 'rails)))
   (let* ((default-directory (file-name-as-directory dir))
-         (env (inf-ruby-console-rails-env))
-         (with-bundler (file-exists-p "Gemfile")))
+         (env (inf-ruby-console-rails-env)))
     (inf-ruby-console-run
-     (concat (when with-bundler "bundle exec ")
-             "rails console -e "
+     (concat (or
+              (cl-find-if #'file-exists-p
+                          '("bin/rails" "script/rails"))
+              (error "No Rails binstub found, use `rails app:update:bin'"))
+             " console -e "
              env
              ;; Note: this only has effect in Rails < 5.0 or >= 5.1.4
              ;; https://github.com/rails/rails/pull/29010
