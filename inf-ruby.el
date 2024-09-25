@@ -961,7 +961,7 @@ Then switch to the process buffer."
                   (ruby-shell--encode-string line))))
             (process-send-string proc completion-snippet)
             (while (and (not (string-match inf-ruby-prompt-pattern kept))
-                        (accept-process-output proc 2)))
+                        (accept-process-output proc 2 nil 1)))
             (setq completions (butlast (split-string kept "\r?\n") 2))
             ;; Subprocess echoes output on Windows and OS X.
             (when (and completions (string= (concat (car completions) "\n") completion-snippet))
