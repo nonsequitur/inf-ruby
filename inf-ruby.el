@@ -103,6 +103,12 @@ returns a string."
                            inf-ruby-implementations))
   :group 'inf-ruby)
 
+(defcustom inf-ruby-wrapper-command ""
+  "Launcher command pattern to format the auto-detected command.
+Useful for running the shell in another host or a container (such as Docker). Must include %s."
+  :type 'string
+  :group 'inf-ruby)
+
 (defun inf-ruby--irb-command ()
   (let ((command "irb --prompt default -r irb/completion --noreadline"))
     (when (inf-ruby--irb-needs-nomultiline-p)
@@ -110,10 +116,11 @@ returns a string."
     command))
 
 (defun inf-ruby--irb-needs-nomultiline-p (&optional with-bundler)
-  (let* ((output (car (last (apply #'process-lines
-                                   (append
-                                    (when with-bundler '("bundle" "exec"))
-                                    '("irb" "-v"))))))
+  "Check if IRB needs the --nomultiline argument.
+WITH-BUNDLER, the command is wrapped with `bundle exec'."
+  (let* ((command (format (or inf-ruby-wrapper-command "%s")
+                          (concat (when with-bundler "bundle exec ") "irb -v")))
+         (output (car (last (apply #'process-lines (split-string-and-unquote command)))))
          (fields (split-string output "[ (]")))
     (if (equal (car fields) "irb")
         (version<= "1.2.0" (nth 1 fields))
@@ -1152,7 +1159,8 @@ contains the configuration for the known project types."
           (capitalize (symbol-name type)))))
 
 (defun inf-ruby-console-run (command name)
-  (run-ruby-or-pop-to-buffer command name
+  "Ensure a buffer named NAME running the given COMMAND exists."
+  (run-ruby-or-pop-to-buffer (format inf-ruby-wrapper-command command) name
                              (inf-ruby-buffer-in-directory default-directory)))
 
 ;;;###autoload
