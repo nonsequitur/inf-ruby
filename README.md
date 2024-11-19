@@ -93,6 +93,17 @@ A simple IRB process can be fired up with <kbd>M-x inf-ruby</kbd>.
 To launch a REPL with project-specific console instead, type <kbd>M-x inf-ruby-console-auto</kbd>.
 It recognizes several project types, including Rails, gems and anything with `racksh` in their Gemfile.
 
+### With docker
+
+To run the project specific console in a Docker (or Podman or other) container, or in another shell
+or host, set `inf-mode-wrapper-command` which will be used to `format` to the command for launching
+the console, so it must include `%s`. For instance, one can add the following to a `.dir-locals.el`
+file at the root of a project:
+
+```lisp
+((ruby-mode . ((inf-ruby-wrapper-command . "docker exec -i container_name %s"))))
+```
+
 ### Hooks
 When entered, this mode runs `comint-mode-hook` and
 `inf-ruby-mode-hook` (in that order).
