@@ -122,7 +122,12 @@ So when used it must include %s.  Set to nil to disable."
 WITH-BUNDLER, the command is wrapped with `bundle exec'."
   (let* ((command (format (or inf-ruby-wrapper-command "%s")
                           (concat (when with-bundler "bundle exec ") "irb -v")))
-         (output (car (last (apply #'process-lines (split-string-and-unquote command)))))
+         (output
+          (with-output-to-string
+            (let ((status (call-process-shell-command command nil
+                                                      standard-output)))
+              (unless (eql status 0)
+                (error "%s exited with status %s" command status)))))
          (fields (split-string output "[ (]")))
     (if (equal (car fields) "irb")
         (version<= "1.2.0" (nth 1 fields))
