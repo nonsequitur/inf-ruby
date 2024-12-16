@@ -96,7 +96,7 @@ It recognizes several project types, including Rails, gems and anything with `ra
 ### With docker
 
 To run the project specific console in a Docker (or Podman or other) container, or in another shell
-or host, set `inf-mode-wrapper-command` which will be used to `format` to the command for launching
+or host, set `inf-mode-wrapper-command` which will be passed to `format` to produce the command for launching
 the console, so it must include `%s`. For instance, one can add the following to a `.dir-locals.el`
 file at the root of a project:
 
