@@ -103,10 +103,12 @@ returns a string."
                            inf-ruby-implementations))
   :group 'inf-ruby)
 
-(defcustom inf-ruby-wrapper-command ""
-  "Launcher command pattern to format the auto-detected command.
-Useful for running the shell in another host or a container (such as Docker). Must include %s."
-  :type 'string
+(defcustom inf-ruby-wrapper-command nil
+  "Command template to format the auto-detected project console command.
+Useful for running the shell in another host or a container (such as Docker).
+So when used it must include %s.  Set to nil to disable."
+  :type '(choice (const :tag "Not used" nil)
+                 (string :tag "Command template"))
   :group 'inf-ruby)
 
 (defun inf-ruby--irb-command ()
