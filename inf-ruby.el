@@ -1167,7 +1167,8 @@ contains the configuration for the known project types."
 
 (defun inf-ruby-console-run (command name)
   "Ensure a buffer named NAME running the given COMMAND exists."
-  (run-ruby-or-pop-to-buffer (format inf-ruby-wrapper-command command) name
+  (run-ruby-or-pop-to-buffer (format (or inf-ruby-wrapper-command "%s") command)
+                             name
                              (inf-ruby-buffer-in-directory default-directory)))
 
 ;;;###autoload
