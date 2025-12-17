@@ -165,7 +165,7 @@ commands as `ruby-send-last-stmt' or `ruby-switch-to-inf'."
       "\\(^(rdb:1) *\\)"                  ; Debugger
       "\\(^(rdbg[^)]*) *\\)"              ; Ruby Debug Gem
       "\\(^(byebug) *\\)"                 ; byebug
-      "\\(^[a-z0-9-_]+([a-z0-9-_]+)%s *\\)" ; Rails 7+: project name and environment
+      "\\(^[a-z0-9-_]+([a-z0-9-_]+)[0-9:]*%s *\\)" ; Rails 7+: project name and environment
       "\\(^\\(irb([^)]+)"                 ; IRB default
       "\\([[0-9]+] \\)?[Pp]ry ?([^)]+)"   ; Pry
       "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\(\\.[0-9]+\\)*\\(-?p?[0-9]+\\)?" ; RVM
