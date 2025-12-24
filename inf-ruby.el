@@ -165,13 +165,13 @@ commands as `ruby-send-last-stmt' or `ruby-switch-to-inf'."
       "\\(^(rdb:1) *\\)"                  ; Debugger
       "\\(^(rdbg[^)]*) *\\)"              ; Ruby Debug Gem
       "\\(^(byebug) *\\)"                 ; byebug
-      "\\(^[a-z0-9-_]+([a-z0-9-_]+)\\)"   ; Rails 7+: project name and environment
-      "\\(^\\(irb([^)]+)"                 ; IRB default
+      "\\(^\\([a-z0-9-_]+([a-z0-9-_]+)"   ; Rails 7+: project name and environment
+      "irb([^)]+)"                        ; IRB default
       "\\([[0-9]+] \\)?[Pp]ry ?([^)]+)"   ; Pry
       "\\(jruby-\\|JRUBY-\\)?[1-9]\\.[0-9]\\(\\.[0-9]+\\)*\\(-?p?[0-9]+\\)?" ; RVM
       "^rbx-head\\)")                     ; RVM continued
     "\\|")
-   ;; Statement and nesting counters, common to the last four.
+   ;; Statement and nesting counters, common to the last five.
    " ?[0-9:]* ?%s *\\)")
   "Format string for the prompt regexp pattern.
 Two placeholders: first char in the Simple prompt, and the last
@@ -182,7 +182,7 @@ graphical char in all other prompts.")
 
 (defvar inf-ruby-prompt-pattern
   (let ((delims "[\]>*\"'/`]"))
-    (format inf-ruby-prompt-format "[?>]" delims delims))
+    (format inf-ruby-prompt-format "[?>]" delims))
   "Prompt regex pattern of Ruby interpreter.")
 
 (defvar inf-ruby-mode-hook nil
